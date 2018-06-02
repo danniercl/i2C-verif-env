@@ -6,7 +6,7 @@ g++ -fpic -c sc_tb_vpi.c sc_vpi.c sc_tb.cpp -I /usr/include/iverilog/ -I /usr/lo
 echo 'Creating vpi file'
 g++ -shared -L /usr/local/systemc-2.3.2/lib-linux64  -Wl,-rpath=/usr/local/systemc-2.3.2/lib-linux64 -o sc_tb_vpi.vpi *.o -lsystemc -lm -lvpi
 echo 'Compiling verilog files'
-iverilog -o tb.vvp tb.v ./i2c/rtl/i2c_master_top.v
+iverilog -o tb.vvp -grelative-include tb.v
 echo 'Simulation Started'
 vvp -n -M. -msc_tb_vpi tb.vvp
 echo 'Simulation Ended'
