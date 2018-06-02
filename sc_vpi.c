@@ -5,7 +5,7 @@
 #include "sc_tb_ports.h"
 #include "sc_tb_exports.h"
 
-// CallBack Proto 
+// CallBack Proto
 int sc_tb_calltf(char *user_data);
 int sc_tb_interface(p_cb_data cb_data);
 
@@ -13,88 +13,127 @@ int sc_tb_calltf(char *user_data) {
   s_vpi_value  value_s;
   s_vpi_time  time_s;
   s_cb_data  cb_data_s;
-  vpiHandle clk;
-         
+  vpiHandle wb_clk_i;
+
   time_s.type         = vpiSuppressTime;
   value_s.format      = vpiIntVal;
-  
-  // Set-Up Value Change callback option 
+
+  // Set-Up Value Change callback option
   cb_data_s.user_data = NULL;
   cb_data_s.reason    = cbValueChange;
   cb_data_s.cb_rtn    = sc_tb_interface;
   cb_data_s.time      = &time_s;
   cb_data_s.value     = &value_s;
-  
+
   //Callback signal
-  clk = vpi_handle_by_name("tb.clk", NULL);
-  cb_data_s.obj  = clk;
+  wb_clk_i = vpi_handle_by_name("tb.wb_clk_i", NULL);
+  cb_data_s.obj  = wb_clk_i;
   vpi_register_cb(&cb_data_s);
-  
+
   init_sc();  // Initialize SystemC Model
 
   return(0);
-  
+
 }
 
-//Value change simulation callback routine
+// Value change simulation callback routine
 int sc_tb_interface(p_cb_data cb_data)
 {
   s_vpi_value  value_s;
   s_vpi_time time;
-   
+
   // IO ports systemC testbench
   static INVECTOR   invector;
   static OUTVECTOR  outvector;
 
-  vpiHandle rst      = vpi_handle_by_name("tb.rst", NULL);
-  vpiHandle clk      = vpi_handle_by_name("tb.clk", NULL);
-  vpiHandle wr_cs    = vpi_handle_by_name("tb.wr_cs", NULL);
-  vpiHandle rd_cs    = vpi_handle_by_name("tb.rd_cs", NULL);
-  vpiHandle data_in  = vpi_handle_by_name("tb.data_in", NULL);
-  vpiHandle rd_en    = vpi_handle_by_name("tb.rd_en", NULL);
-  vpiHandle wr_en    = vpi_handle_by_name("tb.wr_en", NULL);
-  vpiHandle data_out = vpi_handle_by_name("tb.data_out", NULL);
-  vpiHandle empty    = vpi_handle_by_name("tb.empty", NULL);
-  vpiHandle full     = vpi_handle_by_name("tb.full", NULL);
-  
-  // Read current value from Verilog 
+  // Handle VPI INPUTS
+  // *****************
+  vpiHandle wb_clk_i     = vpi_handle_by_name("tb.wb_clk_i",     NULL);
+  vpiHandle wb_dat_o     = vpi_handle_by_name("tb.wb_dat_o",     NULL);
+  vpiHandle wb_ack_o     = vpi_handle_by_name("tb.wb_ack_o",     NULL);
+  vpiHandle wb_inta_o    = vpi_handle_by_name("tb.wb_inta_o",    NULL);
+  vpiHandle scl_pad_o    = vpi_handle_by_name("tb.scl_pad_o",    NULL);
+  vpiHandle scl_padoen_o = vpi_handle_by_name("tb.scl_padoen_o", NULL);
+  vpiHandle sda_pad_o    = vpi_handle_by_name("tb.sda_pad_o",    NULL);
+  vpiHandle sda_padoen_o = vpi_handle_by_name("tb.sda_padoen_o", NULL);
+
+  // Handle VPI OUTPUTS
+  // ******************
+  vpiHandle wb_rst_i  = vpi_handle_by_name("tb.wb_rst_i",  NULL);
+  vpiHandle arst_i    = vpi_handle_by_name("tb.arst_i",    NULL);
+  vpiHandle wb_adr_i  = vpi_handle_by_name("tb.wb_adr_i",  NULL);
+  vpiHandle wb_dat_i  = vpi_handle_by_name("tb.wb_dat_i",  NULL);
+  vpiHandle wb_we_i   = vpi_handle_by_name("tb.wb_we_i",   NULL);
+  vpiHandle wb_stb_i  = vpi_handle_by_name("tb.wb_stb_i",  NULL);
+  vpiHandle wb_cyc_i  = vpi_handle_by_name("tb.wb_cyc_i",  NULL);
+  vpiHandle scl_pad_i = vpi_handle_by_name("tb.scl_pad_i", NULL);
+  vpiHandle sda_pad_i = vpi_handle_by_name("tb.sda_pad_i", NULL);
+
+  // Read current value from Verilog
   value_s.format = vpiIntVal;
 
-  vpi_get_value(clk, &value_s);
-  invector.clk = value_s.value.integer;
-    
-  vpi_get_value(data_out, &value_s);
-  invector.data_out = value_s.value.integer;
-  
-  vpi_get_value(empty, &value_s);
-  invector.empty = value_s.value.integer;
-  
-  vpi_get_value(full, &value_s);
-  invector.full = value_s.value.integer;
- 
+  // VPI INPUTS
+  // **********
+  vpi_get_value(wb_clk_i, &value_s);
+  invector.wb_clk_i = value_s.value.integer;
+
+  vpi_get_value(wb_dat_o, &value_s);
+  invector.wb_dat_o = value_s.value.integer;
+
+  vpi_get_value(wb_ack_o, &value_s);
+  invector.wb_ack_o = value_s.value.integer;
+
+  vpi_get_value(wb_inta_o, &value_s);
+  invector.wb_inta_o = value_s.value.integer;
+
+  vpi_get_value(scl_pad_o, &value_s);
+  invector.scl_pad_o = value_s.value.integer;
+
+  vpi_get_value(scl_padoen_o, &value_s);
+  invector.scl_padoen_o = value_s.value.integer;
+
+  vpi_get_value(sda_pad_o, &value_s);
+  invector.sda_pad_o = value_s.value.integer;
+
+  vpi_get_value(sda_padoen_o, &value_s);
+  invector.sda_padoen_o = value_s.value.integer;
+
+
   sc_time sc_time_tmp (1, SC_NS);
   exec_sc(&invector, &outvector, sc_time_tmp);
- 
-  value_s.value.integer = outvector.rst;
-  vpi_put_value(rst, &value_s, 0, vpiNoDelay);
 
-  value_s.value.integer = outvector.wr_cs;
-  vpi_put_value(wr_cs, &value_s, 0, vpiNoDelay);
-  
-  value_s.value.integer = outvector.rd_cs;
-  vpi_put_value(rd_cs, &value_s, 0, vpiNoDelay);
-  
-  value_s.value.integer = outvector.data_in;
-  vpi_put_value(data_in, &value_s, 0, vpiNoDelay);
-  
-  value_s.value.integer = outvector.rd_en;
-  vpi_put_value(rd_en, &value_s, 0, vpiNoDelay);
-  
-  value_s.value.integer = outvector.wr_en;
-  vpi_put_value(wr_en, &value_s, 0, vpiNoDelay);
-  
+  // VPI OUTPUTS
+  // ***********
+  value_s.value.integer = outvector.wb_rst_i;
+  vpi_put_value(wb_rst_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.arst_i;
+  vpi_put_value(arst_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.wb_adr_i;
+  vpi_put_value(wb_adr_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.wb_dat_i;
+  vpi_put_value(wb_dat_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.wb_we_i;
+  vpi_put_value(wb_we_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.wb_stb_i;
+  vpi_put_value(wb_stb_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.wb_cyc_i;
+  vpi_put_value(wb_cyc_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.scl_pad_i;
+  vpi_put_value(scl_pad_i, &value_s, 0, vpiNoDelay);
+
+  value_s.value.integer = outvector.sda_pad_i;
+  vpi_put_value(sda_pad_i, &value_s, 0, vpiNoDelay);
+
+
   if (outvector.done) {
-      
+
      exit_sc();
 
      vpi_control(vpiFinish);
@@ -105,7 +144,7 @@ int sc_tb_interface(p_cb_data cb_data)
 void sc_tb()
 {
 	s_vpi_systf_data tf;
-	
+
 	tf.type		=	vpiSysTask;
 	tf.tfname	=	"$sc_tb";
 	tf.calltf	=	sc_tb_calltf;
