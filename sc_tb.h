@@ -40,7 +40,7 @@ SC_MODULE (interface) {
   sc_inout<bool>        wb_cyc_i;   // valid bus cycle input
 
   // i2c Clock Line
-  // **************
+  // **************Read
   sc_inout<bool> scl_pad_i;  // SCL-line input
 
   // i2c Data Line
@@ -98,7 +98,7 @@ SC_MODULE (monitor) {
     //Scoreboard
     scb_int = scb_ext;
     SC_THREAD(mnt_out);
-      sensitive << intf_int->rd_en.pos();
+      sensitive << intf_int->wb_we_i.pos();
   }
 
   void mnt_out();
@@ -136,7 +136,7 @@ SC_MODULE (base_test) {
     intf_int = intf_ext;
     //environment
     env = new environment("env",intf_ext);
-    SC_CTHREAD(test,intf_ext->clk.pos());
+    SC_CTHREAD(test,intf_ext->wb_clk_i.pos());
 
   }
 };
