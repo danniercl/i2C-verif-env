@@ -5,35 +5,78 @@
     cout<<"@"<<sc_time_stamp()<<" Started Reset " << endl;
     wait(10);
     intf_int->wb_rst_i = false;
-    intf_int->wb_stb_i = true;
     cout<<"@"<<sc_time_stamp()<<" Finished Reset " << endl;
   }
   
-  void driver::write(){
+  void driver::write(sc_uint<8> d_out, sc_uint<8> addr){
     cout<<"@"<<sc_time_stamp()<<" Writing " << endl;
-    intf_int->wb_dat_i = (uint8_t)rand();
-    intf_int->wb_adr_i = rand();
-    intf_int->wb_we_i = true;
+    // assert wishbone signal
     wait(1);
-    scb_int->fifo.write(intf_int->wb_dat_i);
-    intf_int->wb_dat_i = 0;
-    intf_int->wb_adr_i = 0;
-    intf_int->wb_we_i = false;
-       
+    intf_int->wb_adr_i = addr;
+    intf_int->wb_dat_o = d_out;
+    intf_int->wb_cyc_i= true;
+    intf_int->wb_stb_i= true;
+    intf_int->wb_we_i = true;
+ 
+
+   // wait for acknowledge from slave
+    while(intf_int->wb_ack_o){
+    // negate wishbone signals
+        wait(1);
+  
+     	intf_int->wb_cyc_i= false;
+        intf_int->wb_stb_i= false;
+     	intf_int->wb_adr_i  = rand();
+	intf_int->wb_dat_o = rand();
+	intf_int->wb_we_i  = false;
+		
+
+     }
+      
+     
   }
   
-  void driver::read(){
+  void driver::read(sc_uint<8> addr){
     cout<<"@"<<sc_time_stamp()<<" Reading " << endl;
-    intf_int->wb_cyc_i = true;
-    wait(1);
-    intf_int->wb_cyc_i = false;
-  }
+    
+    // assert wishbone signal
+     wait(1);
+    intf_int->wb_adr_i = addr;
+    intf_int->wb_dat_o = rand();
+    intf_int->wb_cyc_i= true;
+    intf_int->wb_stb_i= true;
+    intf_int->wb_we_i = false;
+    
+    
+    
+
+
+    // wait for acknowledge from slave
+     while(intf_int->wb_ack_o){
+
+    // negate wishbone signals
+    
+        wait(1);
+        
+     	intf_int->wb_cyc_i= false;
+        intf_int->wb_stb_i= false;
+     	intf_int->wb_adr_i= rand();
+	intf_int->wb_dat_o= rand();
+	intf_int->wb_we_i = true;
+        
+       
+        }
+
+	
+       
+}
+
 
   void monitor::mnt_out(){
     while(true){
     wait(1);
-    data_out_exp = scb_int->fifo.read();
-    data_out_read = intf_int->wb_dat_o;
+    data_out_exp =  intf_int->wb_dat_o;
+    data_out_read = intf_int->wb_dat_i;
     cout<<"@"<<sc_time_stamp()<<" Monitor data_out:" << data_out_exp << endl;
     cout<<"@"<<sc_time_stamp()<<" Scoreboard data_out:" << data_out_read << endl;
     //Checker 
@@ -49,15 +92,15 @@
     intf_int->done = 0;
     env->drv->reset();
     wait(10);
+    
     for (int i=0; i<10; i++){
-      env->drv->write();
-      wait(10);
+      sc_uint<8> random1 = rand();
+      sc_uint<8> random2 = rand();
+      env->drv->write(random1, random2);
+      wait(1);
+       env->drv->read(random2);
     }
     wait(10);
-    for (int i=0; i<10; i++){
-      env->drv->read();
-      wait(10);
-    }
     // Request for simulation termination
     cout << "=======================================" << endl;
     cout << " SIMULATION END" << endl;

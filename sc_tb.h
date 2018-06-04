@@ -12,8 +12,8 @@ SC_MODULE (interface) {
   // Wishbone Signals
   // ****************
   sc_inout<bool>        wb_clk_i;     // master clock input
-  sc_inout<sc_uint<8> > wb_dat_o;     // databus output
-  sc_inout<bool>        wb_ack_o;     // bus cycle acknowledge output
+  sc_inout<sc_uint<8> > wb_dat_o;     // databus output 
+  sc_inout<bool>        wb_ack_o;     // bus cycle acknowledge  output
   sc_inout<bool>        wb_inta_o;    // interrupt request signal output
 
   // i2c Clock Line
@@ -78,8 +78,8 @@ SC_MODULE (driver) {
   }
 
   void reset();
-  void write();
-  void read();
+  void write(sc_uint<8>,sc_uint<8>);  
+  void read(sc_uint<8>);
 
 };
 
