@@ -48,14 +48,7 @@ int sc_tb_interface(p_cb_data cb_data)
 
   // Handle VPI INPUTS
   // *****************
-  vpiHandle wb_clk_i     = vpi_handle_by_name("tb.wb_clk_i",     NULL);
   vpiHandle wb_dat_o     = vpi_handle_by_name("tb.wb_dat_o",     NULL);
-  vpiHandle wb_ack_o     = vpi_handle_by_name("tb.wb_ack_o",     NULL);
-  vpiHandle wb_inta_o    = vpi_handle_by_name("tb.wb_inta_o",    NULL);
-  vpiHandle scl_pad_o    = vpi_handle_by_name("tb.scl_pad_o",    NULL);
-  vpiHandle scl_padoen_o = vpi_handle_by_name("tb.scl_padoen_o", NULL);
-  vpiHandle sda_pad_o    = vpi_handle_by_name("tb.sda_pad_o",    NULL);
-  vpiHandle sda_padoen_o = vpi_handle_by_name("tb.sda_padoen_o", NULL);
 
   // Handle VPI OUTPUTS
   // ******************
@@ -63,9 +56,6 @@ int sc_tb_interface(p_cb_data cb_data)
   vpiHandle arst_i    = vpi_handle_by_name("tb.arst_i",    NULL);
   vpiHandle wb_adr_i  = vpi_handle_by_name("tb.wb_adr_i",  NULL);
   vpiHandle wb_dat_i  = vpi_handle_by_name("tb.wb_dat_i",  NULL);
-  vpiHandle wb_we_i   = vpi_handle_by_name("tb.wb_we_i",   NULL);
-  vpiHandle wb_stb_i  = vpi_handle_by_name("tb.wb_stb_i",  NULL);
-  vpiHandle wb_cyc_i  = vpi_handle_by_name("tb.wb_cyc_i",  NULL);
   vpiHandle scl_pad_i = vpi_handle_by_name("tb.scl_pad_i", NULL);
   vpiHandle sda_pad_i = vpi_handle_by_name("tb.sda_pad_i", NULL);
 
@@ -74,30 +64,8 @@ int sc_tb_interface(p_cb_data cb_data)
 
   // VPI INPUTS
   // **********
-  vpi_get_value(wb_clk_i, &value_s);
-  invector.wb_clk_i = value_s.value.integer;
-
   vpi_get_value(wb_dat_o, &value_s);
   invector.wb_dat_o = value_s.value.integer;
-
-  vpi_get_value(wb_ack_o, &value_s);
-  invector.wb_ack_o = value_s.value.integer;
-
-  vpi_get_value(wb_inta_o, &value_s);
-  invector.wb_inta_o = value_s.value.integer;
-
-  vpi_get_value(scl_pad_o, &value_s);
-  invector.scl_pad_o = value_s.value.integer;
-
-  vpi_get_value(scl_padoen_o, &value_s);
-  invector.scl_padoen_o = value_s.value.integer;
-
-  vpi_get_value(sda_pad_o, &value_s);
-  invector.sda_pad_o = value_s.value.integer;
-
-  vpi_get_value(sda_padoen_o, &value_s);
-  invector.sda_padoen_o = value_s.value.integer;
-
 
   sc_time sc_time_tmp (1, SC_NS);
   exec_sc(&invector, &outvector, sc_time_tmp);
@@ -116,21 +84,11 @@ int sc_tb_interface(p_cb_data cb_data)
   value_s.value.integer = outvector.wb_dat_i;
   vpi_put_value(wb_dat_i, &value_s, 0, vpiNoDelay);
 
-  value_s.value.integer = outvector.wb_we_i;
-  vpi_put_value(wb_we_i, &value_s, 0, vpiNoDelay);
-
-  value_s.value.integer = outvector.wb_stb_i;
-  vpi_put_value(wb_stb_i, &value_s, 0, vpiNoDelay);
-
-  value_s.value.integer = outvector.wb_cyc_i;
-  vpi_put_value(wb_cyc_i, &value_s, 0, vpiNoDelay);
-
   value_s.value.integer = outvector.scl_pad_i;
   vpi_put_value(scl_pad_i, &value_s, 0, vpiNoDelay);
 
   value_s.value.integer = outvector.sda_pad_i;
   vpi_put_value(sda_pad_i, &value_s, 0, vpiNoDelay);
-
 
   if (outvector.done) {
 
