@@ -1,6 +1,9 @@
 `timescale 1ns / 1ns
 `include "./i2c/rtl/i2c_master_top.v"
 
+// Include the Slave BFM
+`include "./i2c/bench/i2c_slave_model.v"
+
 // Testbench top level
 module tb();
 
@@ -28,15 +31,19 @@ module tb();
 
   // i2c Clock Line
   // **************
-  reg  scl_pad_i;       // SCL-line input
+  wire scl_pad_i;       // SCL-line input
   wire scl_pad_o;       // SCL-line output (always 1'b0)
   wire scl_padoen_o;    // SCL-line output enable (active low)
 
   // i2c Data Line
   // *************
-  reg  sda_pad_i;       // SDA-line input
+  wire sda_pad_i;       // SDA-line input
   wire sda_pad_o;       // SDA-line output (always 1'b0)
   wire sda_padoen_o;    // SDA-line output enable (active low)
+
+  // Slave Address
+  // *************
+  parameter ADDR_SLAVE = 7'h10;
 
   // Clock Generator
   // ***************
@@ -69,12 +76,32 @@ module tb();
     .sda_padoen_o(sda_padoen_o)
   );
 
+  // **************************************************************************
+  // SLAVE BFM Connection
+  // **************************************************************************
+
+  // Create I2C BUS Lines
+  delay m_scl (scl_padoen_o ? 1'bz : scl_pad_o, scl_pad_i),
+        m_sda (sda_padoen_o ? 1'bz : sda_pad_o, sda_pad_i);
+
+  // Connect I2C Lines to Pullup resistors
+  pullup p1(scl_pad_i);
+  pullup p2(sda_pad_i);
+
+  // Hookup I2C Slave BFM
+  i2c_slave_model #(ADDR_SLAVE) i2c_slave (
+  	.scl(scl_pad_i),
+  	.sda(sda_pad_i)
+  );
+
   initial begin
     $dumpfile("i2c.vcd");
     $dumpvars(0);
     $display("[DUT]: Starting I2C Master in SystemC...");
     $sc_tb; // Testbench Connection
     wb_clk_i = 1'b0;
+
+    #10000;
   end
 
 endmodule

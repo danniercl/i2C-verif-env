@@ -66,7 +66,7 @@
 //               Added headers.
 //
 
-`include "timescale.v"
+`include "../rtl/timescale.v"
 
 module i2c_slave_model (scl, sda);
 
@@ -354,4 +354,13 @@ module i2c_slave_model (scl, sda);
 
 endmodule
 
+module delay (in, out);
+  input  in;
+  output out;
 
+  assign out = in;
+
+  specify
+    (in => out) = (600,600);
+  endspecify
+endmodule
