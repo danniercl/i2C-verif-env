@@ -2,6 +2,12 @@
 #define SC_TB_TEST_H
 
 #include "systemc.h"
+#include "scv.h"
+
+#define MAX_VALID_DATA 255
+#define MIN_VALID_DATA 0
+#define MAX_VALID_ADDR 2
+#define MIN_VALID_ADDR 2
 
 SC_MODULE (interface) {
 
@@ -55,9 +61,51 @@ SC_MODULE (interface) {
 
 };
 
-SC_MODULE (driver) {
+// Random data using SCV
+class data_rnd_constraint : public scv_constraint_base {
+public:
+  scv_smart_ptr< sc_uint<8> > data;
+  SCV_CONSTRAINT_CTOR(data_rnd_constraint) {
+    // Hard Constraint
+    SCV_CONSTRAINT ( data() <= MAX_VALID_DATA ); // Max
+    SCV_CONSTRAINT ( data() >= MIN_VALID_DATA ); // Min
+  }
+};
 
+// Random addr using SCV
+class addr_rnd_constraint : public scv_constraint_base {
+public:
+  scv_smart_ptr< sc_uint<8> > addr;
+  SCV_CONSTRAINT_CTOR(addr_rnd_constraint) {
+    // Hard Constraint
+    SCV_CONSTRAINT ( addr() <= MAX_VALID_ADDR ); // Max
+    SCV_CONSTRAINT ( addr() >= MIN_VALID_ADDR ); // Min
+  }
+};
+
+SC_MODULE(stim_gen) {
+  SC_HAS_PROCESS(stim_gen);
+  stim_gen(sc_module_name stim_gen) {
+  }
+
+  void init_seed_gen(){
+    scv_random::set_global_seed(scv_random::pick_random_seed()); //FIXME: needs to come from test seed
+  }
+  sc_uint<8 > data_rnd_gen(){
+    data_rnd_constraint data_rnd ("data_rnd_constraint");
+    data_rnd.next();
+    return data_rnd.data.read();
+  }
+  sc_uint<8 > addr_rnd_gen(){
+    addr_rnd_constraint addr_rnd ("addr_rnd_constraint");
+    addr_rnd.next();
+    return addr_rnd.addr.read();
+  }
+};
+
+SC_MODULE (driver) {
   interface *intf_int;
+  stim_gen *stim_gen_inst;
 
   SC_HAS_PROCESS(driver);
   driver(sc_module_name driver, interface *intf_ext) {
@@ -66,7 +114,7 @@ SC_MODULE (driver) {
   }
 
   void reset();
-  void write(sc_uint<8>,sc_uint<8>);
+  void write(sc_uint<8>, sc_uint<8>);
   void read(sc_uint<8>);
 
 };
