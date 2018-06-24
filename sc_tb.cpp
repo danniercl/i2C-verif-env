@@ -15,6 +15,7 @@
 #define WR  0
 
 void driver::reset(){
+  stim_gen_inst->init_seed_gen();
   intf_int->wb_rst_i = false;
   intf_int->arst_i = true;
   cout<<"@"<<sc_time_stamp()<<" Started Reset " << endl;
@@ -25,13 +26,13 @@ void driver::reset(){
   cout<<"@"<<sc_time_stamp()<<" Finished Reset " << endl;
 }
 
-void driver::write(sc_uint<8> dato, sc_uint<8> addr){
+void driver::write(sc_uint<8> data, sc_uint<8> addr){
   // assert wishbone signal
   wait(2);
-  cout << "WRITE: dato: " << dato << " addr: " << addr << endl;
+  //cout << "WRITE: dato: " << dato << " addr: " << addr << endl;
   wait(2);
   intf_int->wb_adr_i = addr;
-  intf_int->wb_dat_i = dato;
+  intf_int->wb_dat_i = data;
   wait(2);
   intf_int->wb_cyc_i= true;
   intf_int->wb_stb_i= true;
@@ -80,13 +81,13 @@ void monitor::mnt_out(){
   wait(2);
   data_out_exp =  intf_int->wb_dat_o;
   data_out_read = intf_int->wb_dat_i;
-  cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
-  cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
+  // cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
+  // cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
   //Checker
-  if (data_out_exp != data_out_read)
-    cout<<"@"<<sc_time_stamp()<<" ERROR: data read and expected mismatch!" << endl;
-  else
-    cout<<"@"<<sc_time_stamp()<<" SIRVE PAPIS; SIRVE!!!" << endl;
+  //if (data_out_exp != data_out_read)
+  //  cout<<"@"<<sc_time_stamp()<<" ERROR: data read and expected mismatch!" << endl;
+  //else
+  //  cout<<"@"<<sc_time_stamp()<<" SIRVE PAPIS; SIRVE!!!" << endl;
   //}
 }
 
@@ -113,16 +114,16 @@ void base_test::test() {
    env->drv->write(0xa5, TXR); // present slave's memory address
    env->drv->write(0x10, CR); // set command (write)
 
-   //for (int i=0; i<10; i++){
-     sc_uint<8> dato = rand();
-     sc_uint<8> addr = SLAVE_ADDR;
-     cout<<" TEST: Dato: " << dato << " Dirección: " << addr << endl;
-     env->drv->write(dato, addr);
-     wait(2);
-     //env->drv->read(addr);
-     wait(2);
-     env->mnt->mnt_out();
-  //}
+   intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
+   wait(1);
+
+   sc_uint<8> addr = SLAVE_ADDR;
+   cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << addr << endl;
+   env->drv->write(intf_int->wb_dat_i, addr);
+   wait(2);
+   //env->drv->read(addr);
+   wait(2);
+   env->mnt->mnt_out();
   wait(10);
   // Request for simulation termination
   cout << "=======================================" << endl;
