@@ -6,9 +6,9 @@
 #define PRER_HI  1
 #define CTR      2
 #define RXR      3
-#define TXR      4
-#define CR       5
-#define SR       6
+#define TXR      3
+#define CR       4
+#define SR       4
 
 /* Write/Read flags */
 #define RD  1
@@ -97,38 +97,30 @@ void base_test::test() {
    wait(10);
 
    // Program Internal Registers
-   env->drv->write(0xc8, PRER_LO); // load prescaler lo-byte
+   env->drv->write(0x0A, PRER_LO); // load prescaler lo-byte
    env->drv->write(0x00, PRER_HI); // load prescaler hi-byte
    env->drv->write(0x80, CTR); // enable core
 
    // Drive data write
    env->drv->write((SLAVE_ADDR << 1) | WR, TXR); // present slave address, set write-bit
    env->drv->write(0x90, CR); // set command (start, write)
+   wait(100);
 
-   // Send Memory address
-   env->drv->write(0x01, TXR); // present slave's memory address
-   env->drv->write(0x90, CR); // set command (write)
+   env->drv->write(0x01, TXR); // present slave address, set write-bit
+   env->drv->write(0x10, CR); // set command (write)
+   wait(1000);
 
-   // Send Data
-   env->drv->write(0xa5, TXR); // present slave's memory address
+   env->drv->write(0xa5, TXR); // present slave address, set write-bit
    env->drv->write(0x10, CR); // set command (write)
 
-   //for (int i=0; i<10; i++){
-     sc_uint<8> dato = rand();
-     sc_uint<8> addr = SLAVE_ADDR;
-     cout<<" TEST: Dato: " << dato << " Dirección: " << addr << endl;
-     env->drv->write(dato, addr);
-     wait(2);
-     //env->drv->read(addr);
-     wait(2);
-     env->mnt->mnt_out();
-  //}
-  wait(10);
+   cout<<" TEST: Dato: " << 0xa5 << " Dirección: " << TXR << endl;
+
+  wait(1000);
   // Request for simulation termination
   cout << "=======================================" << endl;
   cout << " SIMULATION END" << endl;
   cout << "=======================================" << endl;
-  wait(10);
+  wait(1000);
   intf_int->done = 1;
   // Just wait for few cycles
 }
