@@ -1,5 +1,4 @@
 #include "sc_tb.h"
-#define SLAVE_ADDR 2
 
 /* Addresses to configuration */
 #define PRER_LO  0
@@ -93,6 +92,9 @@ void monitor::mnt_out(){
 
 //Test
 void base_test::test() {
+   // Generate address (ID) of the slave
+   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen();
+
    intf_int->done = 0;
    env->drv->reset();
    wait(10);
@@ -103,7 +105,7 @@ void base_test::test() {
    env->drv->write(0x80, CTR); // enable core
 
    // Drive data write
-   env->drv->write((SLAVE_ADDR << 1) | WR, TXR); // present slave address, set write-bit
+   env->drv->write((addr << 1) | WR, TXR); // present slave address, set write-bit
    env->drv->write(0x90, CR); // set command (start, write)
    wait(100);
 
@@ -117,8 +119,7 @@ void base_test::test() {
    intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
    wait(1);
 
-   sc_uint<8> addr = SLAVE_ADDR;
-   cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << TXR << endl;
+   cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << addr << endl;
    env->drv->write(intf_int->wb_dat_i, addr);
    wait(2);
    //env->drv->read(addr);
