@@ -197,7 +197,7 @@ module i2c_master_bit_ctrl (
     // slave_wait remains asserted until the slave releases SCL
     always @(posedge clk or negedge nReset)
       if (!nReset) slave_wait <= 1'b0;
-      else         slave_wait <= (scl_oen & ~dscl_oen & ~sSCL) | (slave_wait & ~sSCL);
+      // else         slave_wait <= (scl_oen & ~dscl_oen & ~sSCL) | (slave_wait & ~sSCL);
 
     // master drives SCL high, but another master pulls it low
     // master start counting down its low cycle now (clock synchronization)
@@ -219,7 +219,7 @@ module i2c_master_bit_ctrl (
       else if (slave_wait)
       begin
           cnt    <= #1 cnt;
-          clk_en <= #1 1'b0;    
+          clk_en <= #1 1'b0;
       end
       else
       begin

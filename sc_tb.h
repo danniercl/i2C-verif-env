@@ -2,6 +2,12 @@
 #define SC_TB_TEST_H
 
 #include "systemc.h"
+#include "scv.h"
+
+#define MAX_VALID_DATA 255
+#define MIN_VALID_DATA 0
+#define MAX_VALID_ADDR 2
+#define MIN_VALID_ADDR 2
 
 SC_MODULE (interface) {
 
@@ -13,7 +19,7 @@ SC_MODULE (interface) {
   // ****************
   sc_inout<bool>        wb_clk_i;     // master clock input
   sc_inout<sc_uint<8> > wb_dat_o;     // databus output
-  sc_inout<bool>        wb_ack_o;     // bus cycle acknowledge output
+  sc_inout<bool>        wb_ack_o;     // bus cycle acknowledge  output
   sc_inout<bool>        wb_inta_o;    // interrupt request signal output
 
   // i2c Clock Line
@@ -55,48 +61,75 @@ SC_MODULE (interface) {
 
 };
 
-SC_MODULE (scoreboard) {
+// Random data using SCV
+class data_rnd_constraint : public scv_constraint_base {
+public:
+  scv_smart_ptr< sc_uint<8> > data;
+  SCV_CONSTRAINT_CTOR(data_rnd_constraint) {
+    // Hard Constraint
+    SCV_CONSTRAINT ( data() <= MAX_VALID_DATA ); // Max
+    SCV_CONSTRAINT ( data() >= MIN_VALID_DATA ); // Min
+  }
+};
 
-  sc_fifo<sc_uint<8> > fifo;
+// Random addr using SCV
+class addr_rnd_constraint : public scv_constraint_base {
+public:
+  scv_smart_ptr< sc_uint<8> > addr;
+  SCV_CONSTRAINT_CTOR(addr_rnd_constraint) {
+    // Hard Constraint
+    SCV_CONSTRAINT ( addr() <= MAX_VALID_ADDR ); // Max
+    SCV_CONSTRAINT ( addr() >= MIN_VALID_ADDR ); // Min
+  }
+};
 
-  SC_CTOR(scoreboard) {
-    sc_fifo<sc_uint<8> > fifo (100); //FIXME this should be dynamic allocation.
+SC_MODULE(stim_gen) {
+  SC_HAS_PROCESS(stim_gen);
+  stim_gen(sc_module_name stim_gen) {
+  }
+
+  void init_seed_gen(){
+    scv_random::set_global_seed(scv_random::pick_random_seed()); //FIXME: needs to come from test seed
+  }
+  sc_uint<8 > data_rnd_gen(){
+    data_rnd_constraint data_rnd ("data_rnd_constraint");
+    data_rnd.next();
+    return data_rnd.data.read();
+  }
+  sc_uint<8 > addr_rnd_gen(){
+    addr_rnd_constraint addr_rnd ("addr_rnd_constraint");
+    addr_rnd.next();
+    return addr_rnd.addr.read();
   }
 };
 
 SC_MODULE (driver) {
-
   interface *intf_int;
-  scoreboard *scb_int;
+  stim_gen *stim_gen_inst;
 
   SC_HAS_PROCESS(driver);
-  driver(sc_module_name driver, scoreboard *scb_ext, interface *intf_ext) {
+  driver(sc_module_name driver, interface *intf_ext) {
     //Interface
     intf_int = intf_ext;
-    //Scoreboard
-    scb_int = scb_ext;
   }
 
   void reset();
-  void write();
-  void read();
+  void write(sc_uint<8>, sc_uint<8>);
+  void read(sc_uint<8>);
 
 };
 
 SC_MODULE (monitor) {
 
   interface *intf_int;
-  scoreboard *scb_int;
 
   sc_uint<8> data_out_exp;
   sc_uint<8> data_out_read;
 
   SC_HAS_PROCESS(monitor);
-  monitor(sc_module_name monitor, scoreboard *scb_ext, interface *intf_ext) {
+  monitor(sc_module_name monitor, interface *intf_ext) {
     //Interface
     intf_int=intf_ext;
-    //Scoreboard
-    scb_int = scb_ext;
     SC_THREAD(mnt_out);
       sensitive << intf_int->wb_we_i.pos();
   }
@@ -109,17 +142,14 @@ SC_MODULE (environment) {
 
   driver *drv;
   monitor *mnt;
-  scoreboard *scb;
 
   SC_HAS_PROCESS(environment);
   environment(sc_module_name environment, interface *intf_ext) {
 
-    //Scoreboard
-    scb = new scoreboard("scb");
     //Driver
-    drv = new driver("drv",scb,intf_ext);
+    drv = new driver("drv",intf_ext);
     //Monitor
-    mnt = new monitor("mnt",scb,intf_ext);
+    mnt = new monitor("mnt",intf_ext);
 
   }
 };

@@ -43,7 +43,7 @@ module tb();
 
   // Slave Address
   // *************
-  parameter ADDR_SLAVE = 7'h10;
+  parameter ADDR_SLAVE = 7'h2;
 
   // Clock Generator
   // ***************
