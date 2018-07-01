@@ -37,15 +37,12 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
   intf_int->wb_stb_i= true;
   intf_int->wb_we_i = true;
 
-  //while(intf_int->wb_clk_i){}
-  cout << "Waiting ack: " << endl;
-  // wait for acknowledge from slave
-  while(intf_int->wb_ack_o){}
   // negate wishbone signals
   wait(2);
   intf_int->wb_cyc_i= false;
   intf_int->wb_stb_i= false;
   intf_int->wb_adr_i  = addr;
+
 	//intf_int->wb_dat_i = rand();
 	intf_int->wb_we_i  = false;
   cout<<"@"<<sc_time_stamp()<<" Writing " << endl;
@@ -107,23 +104,32 @@ void base_test::test() {
    // Drive data write
    env->drv->write((addr << 1) | WR, TXR); // present slave address, set write-bit
    env->drv->write(0x90, CR); // set command (start, write)
-   wait(100);
+   //while(intf_int->wb_clk_i){}
+   cout << "Waiting ack: " << endl;
+   // wait for acknowledge from slave
+   while(false == intf_int->wb_ack_o){
+     wait(1);
+   }
 
    env->drv->write(0x01, TXR); // present slave address, set write-bit
    env->drv->write(0x10, CR); // set command (write)
-   wait(1000);
+   // wait for acknowledge from slave
+   while(false == intf_int->wb_ack_o){
+     wait(1);
+   }
+   env->drv->write(0x40, CR); // Stop
 
-   env->drv->write(0xa5, TXR); // present slave address, set write-bit
-   env->drv->write(0x10, CR); // set command (write)
+   // env->drv->write(0xa5, TXR); // present slave address, set write-bit
+   // env->drv->write(0x10, CR); // set command (write)
 
    intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
    wait(1);
 
-   cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << addr << endl;
-   env->drv->write(intf_int->wb_dat_i, addr);
-   wait(2);
+   // cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << addr << endl;
+   // env->drv->write(intf_int->wb_dat_i, addr);
+   // wait(2);
    //env->drv->read(addr);
-   wait(2);
+   // wait(2);
    env->mnt->mnt_out();
   wait(10);
   // Request for simulation termination

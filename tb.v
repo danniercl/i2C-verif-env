@@ -81,8 +81,13 @@ module tb();
   // **************************************************************************
 
   // Create I2C BUS Lines
-  delay m_scl (scl_padoen_o ? 1'bz : scl_pad_o, scl_pad_i),
-        m_sda (sda_padoen_o ? 1'bz : sda_pad_o, sda_pad_i);
+
+  //delay m_scl (scl_padoen_o ? 1'bz : scl_pad_o, scl_pad_i),
+  //      m_sda (sda_padoen_o ? 1'bz : sda_pad_o, sda_pad_i);
+  // assign scl_pad_i = scl_padoen_o ? 1'bz : scl_pad_o;
+  // assign sda_pad_i = sda_padoen_o ? 1'bz : sda_pad_o;
+  assign scl_pad_i = scl_padoen_o;
+  assign sda_pad_i = sda_padoen_o;
 
   // Connect I2C Lines to Pullup resistors
   pullup p1(scl_pad_i);
