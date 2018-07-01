@@ -224,6 +224,7 @@ module i2c_master_byte_ctrl (
 	  begin
 	      // initially reset all signals
 	      core_txd <= #1 sr[7];
+				// core_txd <= #1 1'b0;
 	      shift    <= #1 1'b0;
 	      ld       <= #1 1'b0;
 	      cmd_ack  <= #1 1'b0;
@@ -293,7 +294,7 @@ module i2c_master_byte_ctrl (
 	                if (cnt_done)
 	                  begin
 	                      c_state  <= #1 ST_ACK;
-	                      core_cmd <= #1 `I2C_CMD_WRITE;
+	                      core_cmd <= #1 `I2C_CMD_READ;
 	                  end
 	                else
 	                  begin

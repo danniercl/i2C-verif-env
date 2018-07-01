@@ -153,11 +153,11 @@ module i2c_master_top(
 	wire rst_i = arst_i ^ ARST_LVL;
 
 	// generate wishbone signals
-	wire wb_wacc = wb_we_i & wb_ack_o;
+	wire wb_wacc = wb_we_i & wb_cyc_i & wb_stb_i;
 
 	// generate acknowledge output signal
 	always @(posedge wb_clk_i)
-	  wb_ack_o <= #1 wb_cyc_i & wb_stb_i & ~wb_ack_o; // because timing is always honored
+	  wb_ack_o <= irq_flag;
 
 	// assign DAT_O
 	always @(posedge wb_clk_i)
@@ -211,7 +211,7 @@ module i2c_master_top(
 	    end
 	  else
 	    begin
-	        if (done | i2c_al)
+	        if (done)
 	          cr[7:4] <= #1 4'h0;           // clear command bits when done
 	                                        // or when aribitration lost
 	        cr[2:1] <= #1 2'b0;             // reserved bits
@@ -278,7 +278,7 @@ module i2c_master_top(
 	        al       <= #1 i2c_al | (al & ~sta);
 	        rxack    <= #1 irxack;
 	        tip      <= #1 (rd | wr);
-	        irq_flag <= #1 (done | i2c_al | irq_flag) & ~iack; // interrupt request flag is always generated
+	        irq_flag <= #1 done; // interrupt request flag is always generated
 	    end
 
 	// generate interrupt request signals
