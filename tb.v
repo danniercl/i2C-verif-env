@@ -1,8 +1,8 @@
 `timescale 1ns / 1ns
-`include "./i2c/rtl/i2c_master_top.v"
+//`include "./i2c/rtl/i2c_master_top.v"
 
 // Include the Slave BFM
-`include "./i2c/bench/i2c_slave_model.v"
+//`include "./i2c/bench/i2c_slave_model.v"
 
 // Testbench top level
 module tb();

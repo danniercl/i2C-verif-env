@@ -66,7 +66,7 @@
 //               Added headers.
 //
 
-`include "../rtl/timescale.v"
+`timescale 1ns / 10ps
 
 module i2c_slave_model (scl, sda);
 
@@ -341,7 +341,7 @@ module i2c_slave_model (scl, sda);
 	            fast_thd_sta  =  600,
 	            fast_tsu_sto  =  600,
 	            fast_tbuf     = 1300;
-
+/*
 	  $width(negedge scl, normal_scl_low);  // scl low time
 	  $width(posedge scl, normal_scl_high); // scl high time
 
@@ -350,6 +350,7 @@ module i2c_slave_model (scl, sda);
 	  $setup(posedge scl, posedge sda &&& scl, normal_tsu_sto); // setup stop
 
 	  $setup(posedge tst_sta, posedge tst_sto, normal_tbuf); // stop to start time
+*/
 	endspecify
 
 endmodule
