@@ -135,10 +135,10 @@
 //
 
 // synopsys translate_off
-`include "timescale.v"
+`timescale 1ns / 10ps
 // synopsys translate_on
 
-`include "i2c_master_defines.v"
+//`include "i2c_master_defines.v"
 
 module i2c_master_bit_ctrl (
     input             clk,      // system clock
