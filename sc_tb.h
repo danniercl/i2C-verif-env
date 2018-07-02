@@ -61,6 +61,17 @@ SC_MODULE (interface) {
 
 };
 
+//Scoreboard
+
+SC_MODULE (scoreboard) {
+
+  sc_fifo<sc_uint<8> > fifo;
+
+  SC_CTOR(scoreboard) {
+    sc_fifo<sc_uint<8> > fifo (100); //FIXME this should be dynamic allocation.
+  }
+};
+
 // Random data using SCV
 class data_rnd_constraint : public scv_constraint_base {
 public:
@@ -106,11 +117,14 @@ SC_MODULE(stim_gen) {
 SC_MODULE (driver) {
   interface *intf_int;
   stim_gen *stim_gen_inst;
+  scoreboard *scb_int;
 
   SC_HAS_PROCESS(driver);
-  driver(sc_module_name driver, interface *intf_ext) {
+  driver(sc_module_name driver,scoreboard *scb_ext, interface *intf_ext) {
     //Interface
     intf_int = intf_ext;
+    //Scoreboard
+   scb_int = scb_ext;
   }
 
   void reset();
@@ -122,14 +136,20 @@ SC_MODULE (driver) {
 SC_MODULE (monitor) {
 
   interface *intf_int;
+  scoreboard *scb_int;
 
   sc_uint<8> data_out_exp;
   sc_uint<8> data_out_read;
+  sc_uint<8> num_available; // Number of data values in sc_fifo
+  sc_uint<8> num_free; // Number of free slots in sc_fifo
+
 
   SC_HAS_PROCESS(monitor);
-  monitor(sc_module_name monitor, interface *intf_ext) {
+  monitor(sc_module_name monitor,scoreboard *scb_ext, interface *intf_ext) {
     //Interface
     intf_int=intf_ext;
+    //Scoreboard
+   scb_int = scb_ext;
     SC_THREAD(mnt_out);
       sensitive << intf_int->wb_we_i.pos();
   }
@@ -142,15 +162,16 @@ SC_MODULE (environment) {
 
   driver *drv;
   monitor *mnt;
+  scoreboard *scb;
 
   SC_HAS_PROCESS(environment);
   environment(sc_module_name environment, interface *intf_ext) {
-
+    //Scoreboard
+    scb = new scoreboard("scb");
     //Driver
-    drv = new driver("drv",intf_ext);
+    drv = new driver("drv",scb,intf_ext);
     //Monitor
-    mnt = new monitor("mnt",intf_ext);
-
+    mnt = new monitor("mnt",scb,intf_ext);
   }
 };
 
