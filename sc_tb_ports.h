@@ -38,7 +38,7 @@ struct tagOutput {
 
   // i2c Data Line
   // *************
-  unsigned long sda_pad_i;  // SDA-line input
+  // unsigned long sda_pad_i;  // SDA-line input
 
   int done;
 };

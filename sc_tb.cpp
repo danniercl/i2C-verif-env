@@ -91,19 +91,7 @@ void driver::read(sc_uint<8> addr){
   cout<<"@"<<sc_time_stamp()<<" Reading " << endl;
   // assert wishbone signal
   intf_int->wb_adr_i = addr;
-  //intf_int->wb_dat_o = rand();
-  intf_int->wb_cyc_i= true;
-  intf_int->wb_stb_i= true;
-  intf_int->wb_we_i = false;
-  wait(2);
- 	intf_int->wb_cyc_i= false;
-  intf_int->wb_stb_i= false;
-
-  // wait for acknowledge from slave
-  while(intf_int->wb_ack_o){
-    wait(1);
-  }
-	intf_int->wb_we_i = true;
+  wait(4);
 }
 
 void monitor::mnt_out(){
@@ -124,7 +112,7 @@ void monitor::mnt_out(){
 //Test
 void base_test::test() {
    // Generate address (ID) of the slave
-   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen();
+   sc_uint<8> addr = 0x2; // env->drv->stim_gen_inst->addr_rnd_gen();
 
    intf_int->done = 0;
    env->drv->reset();
@@ -141,16 +129,20 @@ void base_test::test() {
 
    env->drv->write(0x01, TXR); // present slave address, set write-bit
    env->drv->write(0x10, CR); // set command (write)
+   env->drv->write(0x99, TXR); // present slave address, set write-bit
+   env->drv->write(0x10, CR); // set command (write)
 
    env->drv->write(0x40, CR); // Stop
 
    wait(1000);
    env->drv->write((addr << 1) | RD, TXR); // present slave address, set write-bit
    env->drv->write(0x90, CR); // set command (start, write)
+   env->drv->write(0x01, TXR); // present slave address
+   env->drv->write(0x10, CR); // set command (write)
    env->drv->write(0x20, CR); // set command (start, write)
    env->drv->read(RXR); // set command (start, read)
-
    cout << "CEROS: " << intf_int->wb_dat_o << endl;
+   env->drv->write(0x40, CR); // Stop
 
    intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
    wait(1);

@@ -67,7 +67,7 @@ int sc_tb_interface(p_cb_data cb_data)
   vpiHandle wb_stb_i  = vpi_handle_by_name("tb.wb_stb_i",  NULL);
   vpiHandle wb_cyc_i  = vpi_handle_by_name("tb.wb_cyc_i",  NULL);
   vpiHandle scl_pad_i = vpi_handle_by_name("tb.scl_pad_i", NULL);
-  vpiHandle sda_pad_i = vpi_handle_by_name("tb.sda_pad_i", NULL);
+  // vpiHandle sda_pad_i = vpi_handle_by_name("tb.sda_pad_i", NULL);
 
   // Read current value from Verilog
   value_s.format = vpiIntVal;
@@ -128,8 +128,8 @@ int sc_tb_interface(p_cb_data cb_data)
   value_s.value.integer = outvector.scl_pad_i;
   vpi_put_value(scl_pad_i, &value_s, 0, vpiNoDelay);
 
-  value_s.value.integer = outvector.sda_pad_i;
-  vpi_put_value(sda_pad_i, &value_s, 0, vpiNoDelay);
+  // value_s.value.integer = outvector.sda_pad_i;
+  // vpi_put_value(sda_pad_i, &value_s, 0, vpiNoDelay);
 
 
   if (outvector.done) {

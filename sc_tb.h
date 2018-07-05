@@ -51,7 +51,7 @@ SC_MODULE (interface) {
 
   // i2c Data Line
   // *************
-  sc_inout<bool> sda_pad_i;  // SDA-line input
+  // sc_inout<bool> sda_pad_i;  // SDA-line input
 
   sc_out<bool>  done; //Terminate sim
 

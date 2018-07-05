@@ -84,19 +84,25 @@ module tb();
 
   //delay m_scl (scl_padoen_o ? 1'bz : scl_pad_o, scl_pad_i),
   //      m_sda (sda_padoen_o ? 1'bz : sda_pad_o, sda_pad_i);
-  // assign scl_pad_i = scl_padoen_o ? 1'bz : scl_pad_o;
-  // assign sda_pad_i = sda_padoen_o ? 1'bz : sda_pad_o;
-  assign scl_pad_i = scl_padoen_o;
-  assign sda_pad_i = sda_padoen_o;
+  // assign scl_pad_i = scl_padoen_o ? scl_pad_o : 1'b1;
+  // assign sda_pad_i = sda_padoen_o ? sda_pad_o : 1'b1;
+  // assign scl_pad_i = scl_padoen_o;
+  // assign sda_pad_i = sda_padoen_o;
 
   // Connect I2C Lines to Pullup resistors
-  pullup p1(scl_pad_i);
-  pullup p2(sda_pad_i);
+  // pulldown p1(scl_pad_i);
+  // pulldown p2(sda_pad_i);
 
   // Hookup I2C Slave BFM
+  // i2c_slave_model #(ADDR_SLAVE) i2c_slave (
+  	//.scl(scl_pad_i),
+  	//.sda(sda_pad_i)
+  //);
+
   i2c_slave_model #(ADDR_SLAVE) i2c_slave (
-  	.scl(scl_pad_i),
-  	.sda(sda_pad_i)
+    .sda_output(sda_pad_i),
+    .sda_input(sda_pad_o),
+    .scl(scl_pad_o)
   );
 
   initial begin

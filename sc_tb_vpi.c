@@ -45,7 +45,7 @@ sc_tb    u_sc_tb("u_sc_tb");
 
   // i2c Data Line
   // *************
-  sc_signal<bool> sda_pad_i;  // SDA-line input
+  // sc_signal<bool> sda_pad_i;  // SDA-line input
 
   sc_signal<bool>  done; //Terminate sim
 
@@ -73,7 +73,7 @@ void init_sc() {
   u_sc_tb.intf->wb_stb_i(wb_stb_i);
   u_sc_tb.intf->wb_cyc_i(wb_cyc_i);
   u_sc_tb.intf->scl_pad_i(scl_pad_i);
-  u_sc_tb.intf->sda_pad_i(sda_pad_i);
+  // u_sc_tb.intf->sda_pad_i(sda_pad_i);
 
   u_sc_tb.intf->done(done);
 
@@ -104,7 +104,7 @@ void drive_hdl(void *Outvector) {
   pOutvector->wb_stb_i  = wb_stb_i.read();
   pOutvector->wb_cyc_i  = wb_cyc_i.read();
   pOutvector->scl_pad_i = scl_pad_i.read();
-  pOutvector->sda_pad_i = sda_pad_i.read();
+  // pOutvector->sda_pad_i = sda_pad_i.read();
 
   pOutvector->done    = done.read();
 }
