@@ -111,43 +111,52 @@ void monitor::mnt_out(){
   //}
 }
 
-//Test
+// This is a Basic Write/Read test
 void base_test::test() {
    // Generate address (ID) of the slave
-   sc_uint<8> addr = 0x2; // env->drv->stim_gen_inst->addr_rnd_gen();
+   sc_uint<8> addr = 0x2; // Slave address
+   // FIXME: Slave has a fix bit in output data (bit 8)
+   sc_uint<8> data = 0x99; // env->drv->stim_gen_inst->addr_rnd_gen(); // Generate random data to send
+   cout << "SENT BYTE: " << data << endl;
 
+   // R E S E T
+   // *********
    intf_int->done = 0;
    env->drv->reset();
    wait(10);
 
-   // Program Internal Registers
+   // S E T  T H E  C O R E
+   // *********************
    env->drv->write(0x0A, PRER_LO); // load prescaler lo-byte
    env->drv->write(0x00, PRER_HI); // load prescaler hi-byte
    env->drv->write(0x80, CTR); // enable core
 
-   // Drive data write
+   // W R I T E
+   // *********
    env->drv->write((addr << 1) | WR, TXR); // present slave address, set write-bit
-   env->drv->write(0x90, CR); // set command (start, write)
+   env->drv->write(0x90, CR);              // set command (start, write)
 
-   env->drv->write(0x01, TXR); // present slave address, set write-bit
-   env->drv->write(0x10, CR); // set command (write)
-   env->drv->write(0x99, TXR); // present slave address, set write-bit
-   env->drv->write(0x10, CR); // set command (write)
+   env->drv->write(0x01, TXR); // present slave memory address
+   env->drv->write(0x10, CR);  // set command (write)
+   env->drv->write(data, TXR); // present the data
+   env->drv->write(0x10, CR);  // set command (write)
 
    env->drv->write(0x40, CR); // Stop
 
    wait(1000);
-   env->drv->write((addr << 1) | RD, TXR); // present slave address, set write-bit
-   env->drv->write(0x90, CR); // set command (start, write)
-   env->drv->write(0x01, TXR); // present slave address
-   env->drv->write(0x10, CR); // set command (write)
-   env->drv->write(0x20, CR); // set command (start, write)
-   env->drv->read(RXR); // set command (start, read)
-   cout << "CEROS: " << intf_int->wb_dat_o << endl;
+
+   // R E A D
+   // *******
+   env->drv->write((addr << 1) | RD, TXR); // present slave address, set read-bit
+   env->drv->write(0x90, CR);              // set command (start, write)
+   env->drv->write(0x01, TXR);             // present slave memory address
+   env->drv->write(0x10, CR);              // set command (write)
+   env->drv->write(0x20, CR);              // set command (read)
+   env->drv->read(RXR);                    // read the register
+   cout << "RECEIVED BYTE: " << intf_int->wb_dat_o << endl;
    env->drv->write(0x40, CR); // Stop
 
-   intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
-   wait(1);
+   wait(10);
 
    env->mnt->mnt_out();
   wait(10);
