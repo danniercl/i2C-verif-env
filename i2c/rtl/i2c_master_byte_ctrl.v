@@ -131,7 +131,7 @@ module i2c_master_byte_ctrl (
 	wire       core_ack, core_rxd;
 
 	// signals for shift register
-	reg [7:0] sr; //8bit shift register
+	reg [7:0] sr;        //8bit shift register
 	reg       shift, ld;
 
 	// signals for state machine

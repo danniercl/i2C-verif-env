@@ -79,8 +79,8 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	// input && outpus
 	//
 	input scl;
-	input sda_input;
-	output reg sda_output;  // sda-drive level
+	input sda_input;       // sda-drive level input
+	output reg sda_output; // sda-drive level ouput
 
 	//
 	// Variable declaration
@@ -131,8 +131,6 @@ module i2c_slave_model (scl, sda_input, sda_output);
 
 	//detect my_address
 	assign my_adr = (sr[7:1] == I2C_ADR);
-	// FIXME: This should not be a generic assign, but rather
-	// qualified on address transfer phase and probably reset by stop
 
 	//generate bit-counter
 	always @(posedge scl)
@@ -149,7 +147,6 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	// According to the Phillips i2c spec, there s/b a 0 ns hold time for sda
 	// with regards to scl. If the data changes coincident with the clock, the
 	// acknowledge is missed
-	// Fix by Michael Sosnoski
 	assign #1 sda_dly = sda_input;
 
   // assign sda_output = sda_o;
@@ -318,9 +315,6 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	  if(!acc_done && rw)
 	    mem_do <= #1 {mem_do[6:0], 1'b1}; // insert 1'b1 for host ack generation
 
-	// generate tri-states
-	// assign sda = sda_o ? 1'bz : 1'b0;
-
 	//
 	// Timing checks
 	//
@@ -342,16 +336,7 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	            fast_thd_sta  =  600,
 	            fast_tsu_sto  =  600,
 	            fast_tbuf     = 1300;
-/*
-	  $width(negedge scl, normal_scl_low);  // scl low time
-	  $width(posedge scl, normal_scl_high); // scl high time
 
-	  $setup(posedge scl, negedge sda &&& scl, normal_tsu_sta); // setup start
-	  $setup(negedge sda &&& scl, negedge scl, normal_thd_sta); // hold start
-	  $setup(posedge scl, posedge sda &&& scl, normal_tsu_sto); // setup stop
-
-	  $setup(posedge tst_sta, posedge tst_sto, normal_tbuf); // stop to start time
-*/
 	endspecify
 
 endmodule
