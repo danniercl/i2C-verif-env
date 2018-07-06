@@ -338,7 +338,7 @@ module i2c_master_bit_ctrl (
                              default:        c_state <= #1 idle;
                         endcase
 
-                        scl_oen <= #1 1'b0; // keep SCL in same state
+                        scl_oen <= #1 1'b1; // keep SCL in same state
                         sda_oen <= #1 1'b0; // keep SDA in same state
                         scl_o <= #1 scl_o;
                         sda_o <= #1 sda_o;

@@ -13,6 +13,35 @@
 #define RD  1
 #define WR  0
 
+/* Register bits */
+/* ConTRol Register */
+enum ctr {
+  // 0:5 Reserved
+  CTR_IEN = 6,
+  CTR_EN = 7
+};
+
+/* Command Register */
+enum cr {
+  CR_IACK = 0,
+  // 2:1 Reserved
+  CR_ACK = 3,
+  CR_WR = 4,
+  CR_RD = 5,
+  CR_STO = 6,
+  CR_STA = 7
+};
+
+/* Status Register */
+enum sr {
+  SR_IF = 0,
+  SR_TIP = 1,
+  // 4:2 Reserved
+  SR_AL = 5,
+  SR_BUSY = 6,
+  SR_RXACK = 7
+};
+
 void driver::reset(){
   stim_gen_inst->init_seed_gen();
   intf_int->wb_rst_i = false;
@@ -28,7 +57,7 @@ void driver::reset(){
 void driver::write(sc_uint<8> data, sc_uint<8> addr){
   // assert wishbone signal
   wait(2);
-  //cout << "WRITE: dato: " << dato << " addr: " << addr << endl;
+  cout << "WRITE: dato: " << data << " addr: " << addr << endl;
   wait(2);
   intf_int->wb_adr_i = addr;
   intf_int->wb_dat_i = data;
@@ -43,33 +72,26 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
   intf_int->wb_stb_i= false;
   intf_int->wb_adr_i  = addr;
 
-	//intf_int->wb_dat_i = rand();
 	intf_int->wb_we_i  = false;
   cout<<"@"<<sc_time_stamp()<<" Writing " << endl;
+
+  sc_uint<8> need_wait_ack = data & ((1 << CR_WR) |
+                                     (1 << CR_RD) |
+                                     (1 << CR_STO) |
+                                     (1 << CR_STA));
+
+  if (CR == addr && need_wait_ack) {
+    while(false == intf_int->wb_ack_o){
+      wait(1);
+    }
+  }
 }
 
 void driver::read(sc_uint<8> addr){
   cout<<"@"<<sc_time_stamp()<<" Reading " << endl;
-
   // assert wishbone signal
-  wait(2);
   intf_int->wb_adr_i = addr;
-  //intf_int->wb_dat_o = rand();
-  intf_int->wb_cyc_i= true;
-  intf_int->wb_stb_i= true;
-  intf_int->wb_we_i = false;
-
-  //while(intf_int->wb_clk_i){}
-
-  // wait for acknowledge from slave
-  while(intf_int->wb_ack_o){}
-  // negate wishbone signals
-  wait(2);
- 	intf_int->wb_cyc_i= false;
-  intf_int->wb_stb_i= false;
- 	//intf_int->wb_adr_i= rand();
-	//intf_int->wb_dat_o = rand();
-	intf_int->wb_we_i = true;
+  wait(4);
 }
 
 void monitor::mnt_out(){
@@ -90,7 +112,7 @@ void monitor::mnt_out(){
 //Test
 void base_test::test() {
    // Generate address (ID) of the slave
-   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen();
+   sc_uint<8> addr = 0x2; // env->drv->stim_gen_inst->addr_rnd_gen();
 
    intf_int->done = 0;
    env->drv->reset();
@@ -104,32 +126,27 @@ void base_test::test() {
    // Drive data write
    env->drv->write((addr << 1) | WR, TXR); // present slave address, set write-bit
    env->drv->write(0x90, CR); // set command (start, write)
-   //while(intf_int->wb_clk_i){}
-   cout << "Waiting ack: " << endl;
-   // wait for acknowledge from slave
-   while(false == intf_int->wb_ack_o){
-     wait(1);
-   }
 
    env->drv->write(0x01, TXR); // present slave address, set write-bit
    env->drv->write(0x10, CR); // set command (write)
-   // wait for acknowledge from slave
-   while(false == intf_int->wb_ack_o){
-     wait(1);
-   }
+   env->drv->write(0x99, TXR); // present slave address, set write-bit
+   env->drv->write(0x10, CR); // set command (write)
+
    env->drv->write(0x40, CR); // Stop
 
-   // env->drv->write(0xa5, TXR); // present slave address, set write-bit
-   // env->drv->write(0x10, CR); // set command (write)
+   wait(1000);
+   env->drv->write((addr << 1) | RD, TXR); // present slave address, set write-bit
+   env->drv->write(0x90, CR); // set command (start, write)
+   env->drv->write(0x01, TXR); // present slave address
+   env->drv->write(0x10, CR); // set command (write)
+   env->drv->write(0x20, CR); // set command (start, write)
+   env->drv->read(RXR); // set command (start, read)
+   cout << "CEROS: " << intf_int->wb_dat_o << endl;
+   env->drv->write(0x40, CR); // Stop
 
    intf_int->wb_dat_i = env->drv->stim_gen_inst->data_rnd_gen();
    wait(1);
 
-   // cout<<" TEST: Dato: " << intf_int->wb_dat_i << " Dirección: " << addr << endl;
-   // env->drv->write(intf_int->wb_dat_i, addr);
-   // wait(2);
-   //env->drv->read(addr);
-   // wait(2);
    env->mnt->mnt_out();
   wait(10);
   // Request for simulation termination
