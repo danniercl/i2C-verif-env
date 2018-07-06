@@ -68,6 +68,7 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
 
   // negate wishbone signals
   wait(2);
+  //scb_int->fifo.write(intf_int->wb_dat_i);
   intf_int->wb_cyc_i= false;
   intf_int->wb_stb_i= false;
   intf_int->wb_adr_i  = addr;
@@ -98,6 +99,7 @@ void monitor::mnt_out(){
   //while(true){
   wait(2);
   data_out_exp =  intf_int->wb_dat_o;
+  //data_out_exp =  scb_int->fifo.read();;
   data_out_read = intf_int->wb_dat_i;
   // cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
   // cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
