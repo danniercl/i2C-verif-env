@@ -114,15 +114,14 @@ void monitor::mnt_out(){
 // This is a Basic Write/Read test
 void base_test::test() {
    // Generate address (ID) of the slave
-   sc_uint<8> addr = 0x2; // Slave address
-   // FIXME: Slave has a fix bit in output data (bit 8)
-   sc_uint<8> data = 0x99; // env->drv->stim_gen_inst->addr_rnd_gen(); // Generate random data to send
+   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
+   env->drv->reset();
+   sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen(); // Generate random data to send
    cout << "SENT BYTE: " << data << endl;
 
    // R E S E T
    // *********
    intf_int->done = 0;
-   env->drv->reset();
    wait(10);
 
    // S E T  T H E  C O R E
