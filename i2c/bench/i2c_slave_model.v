@@ -252,6 +252,7 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	            gma_ack:
 	              begin
 	                  state <= #1 data;
+                    sda_output <= #1  mem[mem_adr][7];
 										mem_do <= #1 mem[mem_adr];
 	                  ld    <= #1 1'b1;
 	              end
