@@ -1,7 +1,7 @@
 #include "../sc_tb.h"
 
 // This is a Basic Write/Read test
-void base_test::test() {
+void suite_test::basic_test() {
    // Generate address (ID) of the slave
    sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
    env->drv->reset();
@@ -12,7 +12,6 @@ void base_test::test() {
 
    // R E S E T
    // *********
-   intf_int->done = 0;
    wait(10);
 
    // S E T  T H E  C O R E
@@ -36,6 +35,5 @@ void base_test::test() {
    cout << " SIMULATION END" << endl;
    cout << "=======================================" << endl;
    wait(1000);
-   intf_int->done = 1;
   // Just wait for few cycles
 }
