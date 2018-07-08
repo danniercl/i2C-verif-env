@@ -130,6 +130,9 @@ SC_MODULE (driver) {
   void reset();
   void write(sc_uint<8>, sc_uint<8>);
   void read(sc_uint<8>);
+  void write_data(sc_uint<8>, sc_uint<8>, sc_uint<8>);
+  void read_data(sc_uint<8>, sc_uint<8>);
+  void core_enable();
 
 };
 
