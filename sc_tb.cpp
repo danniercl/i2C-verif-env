@@ -52,7 +52,6 @@ void driver::read(sc_uint<8> addr){
 
 
 void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
-   scb_int->fifo.write(data);
    write((addr << 1) | WR, TXR); // present slave address, set write-bit
    write(0x90, CR);              // set command (start, write)
    write(mem_addr, TXR);         // present slave memory address
@@ -81,20 +80,34 @@ void driver::core_enable(){
    write(0x80, CTR);     // enable core
 }
 
-void monitor::mnt_out(sc_uint<8> received){
+void monitor::mnt_out(){
+  //while(true){
   wait(2);
+  bool failed_test;
+  // num_free = scb_int->expected_fifo.num_free();
+  //  cout << "fifo size: " << num_free << endl;
   cout<<"@"<<sc_time_stamp()<<" entered scoreboard!" << endl;
-  num_available= scb_int->fifo.num_available();
-  if (num_available > 0 ){
-  data_out_read = received;
-  data_out_exp =  scb_int->fifo.read();;
-  cout<<"@"<<sc_time_stamp()<<" Data expected: " << data_out_exp << endl;
-  cout<<"@"<<sc_time_stamp()<<" Data received: " << data_out_read << endl;
-  // Checker
-  //if (data_out_exp != data_out_read)
-  //  cout<<"@"<<sc_time_stamp()<<" ERROR: data read and expected mismatch!" << endl;
-  //else
-  //  cout<<"@"<<sc_time_stamp()<<" SIRVE PAPIS; SIRVE!!!" << endl;
-  //}
-}
+  num_available= scb_int->expected_fifo.num_available();
+  for (sc_uint<8> j = 0; j < num_available ; j ++){
+  data_out_read = scb_int->received_fifo.read();;
+  data_out_exp  =  scb_int->expected_fifo.read();
+  //Checker
+  if (data_out_exp != data_out_read){
+   cout<<"@"<<sc_time_stamp() <<" ERROR:  read data and expected data mismatch!" << "at iteration # "
+   << j+1 << endl;
+   failed_test = true;
+ }
+  else
+  cout<<"@" <<sc_time_stamp() <<  " Iteration # "<< j+1 <<" data_out_exp: " << data_out_exp
+  << " data_out_read: "<< data_out_read << endl;
+  }
+  if (failed_test) {
+  cout << "=======================================" << endl;
+  cout << " TEST FAILED!" << endl;
+  cout << "=======================================" << endl;
+} else {
+  cout << "=======================================" << endl;
+  cout << " TEST PASSED!" << endl;
+  cout << "=======================================" << endl;
+  }
 }

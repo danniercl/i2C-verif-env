@@ -106,10 +106,13 @@ SC_MODULE (interface) {
 
 //Scoreboard
 SC_MODULE (scoreboard) {
-  sc_fifo<sc_uint<8> > fifo;
+
+  sc_fifo<sc_uint<8> > received_fifo ;
+    sc_fifo<sc_uint<8> > expected_fifo;
 
   SC_CTOR(scoreboard) {
-    sc_fifo<sc_uint<8> > fifo (100); //FIXME this should be dynamic allocation.
+    sc_fifo<sc_uint<8> > received_fifo (100); //FIXME this should be dynamic allocation.
+    sc_fifo<sc_uint<8> > expected_fifo (100);
   }
 };
 
@@ -211,7 +214,7 @@ SC_MODULE (monitor) {
     //   sensitive << intf_int->wb_we_i.pos();
   }
 
-  void mnt_out(sc_uint<8>);
+  void mnt_out();
 };
 
 SC_MODULE (environment) {

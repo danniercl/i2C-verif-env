@@ -19,10 +19,10 @@ void suite_test::test() {
 
   // R A N D O M  V A L U E S
   // ------------------------
-  suite_test::random_addr();
-  suite_test::random_mem_addr();
-  suite_test::random_data();
-  suite_test::random_all();
+ suite_test::random_addr();
+ suite_test::random_mem_addr();
+ suite_test::random_data();
+ suite_test::random_all();
 
   intf_int->done = 1;
 }
