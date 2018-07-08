@@ -95,7 +95,7 @@ module tb();
     $sc_tb; // Testbench Connection
     wb_clk_i = 1'b0;
 
-    #10000;
+    #10000000;
   end
 
 endmodule

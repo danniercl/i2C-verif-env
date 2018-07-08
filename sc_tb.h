@@ -6,10 +6,52 @@
 
 #define MAX_VALID_DATA 255
 #define MIN_VALID_DATA 0
-#define MAX_VALID_ADDR 2
+#define MAX_VALID_ADDR 3
 #define MIN_VALID_ADDR 2
-#define MAX_VALID_MEM_ADDR 0
-#define MIN_VALID_MEM_ADDR 255
+#define MAX_VALID_MEM_ADDR 255
+#define MIN_VALID_MEM_ADDR 0
+
+/* Addresses to configuration */
+#define PRER_LO  0
+#define PRER_HI  1
+#define CTR      2
+#define RXR      3
+#define TXR      3
+#define CR       4
+#define SR       4
+
+/* Write/Read flags */
+#define RD  1
+#define WR  0
+
+/* Register bits */
+/* ConTRol Register */
+enum ctr {
+  // 0:5 Reserved
+  CTR_IEN = 6,
+  CTR_EN = 7
+};
+
+/* Command Register */
+enum cr {
+  CR_IACK = 0,
+  // 2:1 Reserved
+  CR_ACK = 3,
+  CR_WR = 4,
+  CR_RD = 5,
+  CR_STO = 6,
+  CR_STA = 7
+};
+
+/* Status Register */
+enum sr {
+  SR_IF = 0,
+  SR_TIP = 1,
+  // 4:2 Reserved
+  SR_AL = 5,
+  SR_BUSY = 6,
+  SR_RXACK = 7
+};
 
 SC_MODULE (interface) {
 
@@ -192,7 +234,11 @@ SC_MODULE (suite_test) {
   interface *intf_int;
   environment *env;
 
-  void basic_test ();
+  void basic_test();
+  void random_addr();
+  void random_mem_addr();
+  void random_data();
+  void random_all();
   void test ();
 
   SC_HAS_PROCESS(suite_test);
