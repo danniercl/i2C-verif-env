@@ -95,6 +95,42 @@ void driver::read(sc_uint<8> addr){
   wait(4);
 }
 
+
+void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
+
+   write((addr << 1) | WR, TXR); // present slave address, set write-bit
+   write(0x90, CR);              // set command (start, write)
+
+   write(mem_addr, TXR); // present slave memory address
+   write(0x10, CR);  // set command (write)
+   write(data, TXR); // present the data
+   write(0x10, CR);  // set command (write)
+
+   write(0x40, CR); // Stop
+
+}
+
+void driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
+
+   write((addr << 1) | RD, TXR); // present slave address, set read-bit
+   write(0x90, CR);              // set command (start, write)
+   write(mem_addr, TXR);             // present slave memory address
+   write(0x10, CR);              // set command (write)
+   write(0x20, CR);              // set command (read)
+   read(RXR);                    // read the register
+   cout << "RECEIVED BYTE: " << intf_int->wb_dat_o << endl;
+   write(0x40, CR); // Stop
+
+}
+
+void driver::core_enable(){
+   write(0x0A, PRER_LO); // load prescaler lo-byte
+   write(0x00, PRER_HI); // load prescaler hi-byte
+   write(0x80, CTR); // enable core
+
+}
+
+
 void monitor::mnt_out(){
   //while(true){
   wait(2);
@@ -119,6 +155,8 @@ void base_test::test() {
    sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen(); // Generate random data to send
    cout << "SENT BYTE: " << data << endl;
 
+   sc_uint<8> mem_addr = 0x01;
+
    // R E S E T
    // *********
    intf_int->done = 0;
@@ -126,44 +164,25 @@ void base_test::test() {
 
    // S E T  T H E  C O R E
    // *********************
-   env->drv->write(0x0A, PRER_LO); // load prescaler lo-byte
-   env->drv->write(0x00, PRER_HI); // load prescaler hi-byte
-   env->drv->write(0x80, CTR); // enable core
+   env->drv->core_enable();
 
    // W R I T E
    // *********
-   env->drv->write((addr << 1) | WR, TXR); // present slave address, set write-bit
-   env->drv->write(0x90, CR);              // set command (start, write)
-
-   env->drv->write(0x01, TXR); // present slave memory address
-   env->drv->write(0x10, CR);  // set command (write)
-   env->drv->write(data, TXR); // present the data
-   env->drv->write(0x10, CR);  // set command (write)
-
-   env->drv->write(0x40, CR); // Stop
-
+   env->drv->write_data(addr, mem_addr, data);
    wait(1000);
 
    // R E A D
    // *******
-   env->drv->write((addr << 1) | RD, TXR); // present slave address, set read-bit
-   env->drv->write(0x90, CR);              // set command (start, write)
-   env->drv->write(0x01, TXR);             // present slave memory address
-   env->drv->write(0x10, CR);              // set command (write)
-   env->drv->write(0x20, CR);              // set command (read)
-   env->drv->read(RXR);                    // read the register
-   cout << "RECEIVED BYTE: " << intf_int->wb_dat_o << endl;
-   env->drv->write(0x40, CR); // Stop
-
+   env->drv->read_data(addr, mem_addr);
    wait(10);
 
    env->mnt->mnt_out();
-  wait(10);
-  // Request for simulation termination
-  cout << "=======================================" << endl;
-  cout << " SIMULATION END" << endl;
-  cout << "=======================================" << endl;
-  wait(1000);
-  intf_int->done = 1;
+   wait(10);
+   // Request for simulation termination
+   cout << "=======================================" << endl;
+   cout << " SIMULATION END" << endl;
+   cout << "=======================================" << endl;
+   wait(1000);
+   intf_int->done = 1;
   // Just wait for few cycles
 }
