@@ -8,6 +8,8 @@
 #define MIN_VALID_DATA 0
 #define MAX_VALID_ADDR 2
 #define MIN_VALID_ADDR 2
+#define MAX_VALID_MEM_ADDR 0
+#define MIN_VALID_MEM_ADDR 255
 
 SC_MODULE (interface) {
 
@@ -52,7 +54,6 @@ SC_MODULE (interface) {
   // i2c Data Line
   // *************
   // sc_inout<bool> sda_pad_i;  // SDA-line input
-
   sc_out<bool>  done; //Terminate sim
 
   SC_CTOR(interface) {
@@ -62,9 +63,7 @@ SC_MODULE (interface) {
 };
 
 //Scoreboard
-
 SC_MODULE (scoreboard) {
-
   sc_fifo<sc_uint<8> > fifo;
 
   SC_CTOR(scoreboard) {
@@ -94,6 +93,17 @@ public:
   }
 };
 
+// Random mem_addr using SCV
+class mem_addr_rnd_constraint : public scv_constraint_base {
+public:
+  scv_smart_ptr< sc_uint<8> > mem_addr;
+  SCV_CONSTRAINT_CTOR(mem_addr_rnd_constraint) {
+    // Hard Constraint
+    SCV_CONSTRAINT ( mem_addr() <= MAX_VALID_MEM_ADDR ); // Max
+    SCV_CONSTRAINT ( mem_addr() >= MIN_VALID_MEM_ADDR ); // Min
+  }
+};
+
 SC_MODULE(stim_gen) {
   SC_HAS_PROCESS(stim_gen);
   stim_gen(sc_module_name stim_gen) {
@@ -111,6 +121,11 @@ SC_MODULE(stim_gen) {
     addr_rnd_constraint addr_rnd ("addr_rnd_constraint");
     addr_rnd.next();
     return addr_rnd.addr.read();
+  }
+  sc_uint<8 > mem_addr_rnd_gen(){
+    mem_addr_rnd_constraint mem_addr_rnd ("mem_addr_rnd_constraint");
+    mem_addr_rnd.next();
+    return mem_addr_rnd.mem_addr.read();
   }
 };
 
@@ -133,19 +148,16 @@ SC_MODULE (driver) {
   void write_data(sc_uint<8>, sc_uint<8>, sc_uint<8>);
   sc_uint<8> read_data(sc_uint<8>, sc_uint<8>);
   void core_enable();
-
 };
 
 SC_MODULE (monitor) {
-
   interface *intf_int;
   scoreboard *scb_int;
 
   sc_uint<8> data_out_exp;
   sc_uint<8> data_out_read;
   sc_uint<8> num_available; // Number of data values in sc_fifo
-  sc_uint<8> num_free; // Number of free slots in sc_fifo
-
+  sc_uint<8> num_free;      // Number of free slots in sc_fifo
 
   SC_HAS_PROCESS(monitor);
   monitor(sc_module_name monitor,scoreboard *scb_ext, interface *intf_ext) {
@@ -158,11 +170,9 @@ SC_MODULE (monitor) {
   }
 
   void mnt_out(sc_uint<8>);
-
 };
 
 SC_MODULE (environment) {
-
   driver *drv;
   monitor *mnt;
   scoreboard *scb;
@@ -178,32 +188,29 @@ SC_MODULE (environment) {
   }
 };
 
-SC_MODULE (base_test) {
-
+SC_MODULE (suite_test) {
   interface *intf_int;
   environment *env;
 
+  void basic_test ();
   void test ();
 
-  SC_HAS_PROCESS(base_test);
-  base_test(sc_module_name base_test, interface *intf_ext) {
+  SC_HAS_PROCESS(suite_test);
+  suite_test(sc_module_name suite_test, interface *intf_ext) {
     intf_int = intf_ext;
     //environment
     env = new environment("env",intf_ext);
     SC_CTHREAD(test,intf_ext->wb_clk_i.pos());
-
   }
 };
 
 SC_MODULE (sc_tb) {
-
-  base_test *test1;
+  suite_test *test1;
   interface *intf;
 
   SC_CTOR(sc_tb) {
     intf = new interface("intf");
-    test1 = new base_test("test1",intf);
-
+    test1 = new suite_test("test1",intf);
   }
 };
 

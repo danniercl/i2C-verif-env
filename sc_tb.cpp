@@ -55,9 +55,8 @@ void driver::reset(){
 }
 
 void driver::write(sc_uint<8> data, sc_uint<8> addr){
-  // assert wishbone signal
   wait(2);
-  cout << "WRITE: dato: " << data << " addr: " << addr << endl;
+  cout << "WRITE: data: " << data << " addr: " << addr << endl;
   wait(2);
   intf_int->wb_adr_i = addr;
   intf_int->wb_dat_i = data;
@@ -68,7 +67,6 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
 
   // negate wishbone signals
   wait(2);
-  //scb_int->fifo.write(intf_int->wb_dat_i);
   intf_int->wb_cyc_i= false;
   intf_int->wb_stb_i= false;
   intf_int->wb_adr_i  = addr;
@@ -90,7 +88,6 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
 
 void driver::read(sc_uint<8> addr){
   cout<<"@"<<sc_time_stamp()<<" Reading " << endl;
-  // assert wishbone signal
   intf_int->wb_adr_i = addr;
   wait(4);
 }
@@ -100,21 +97,17 @@ void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
    scb_int->fifo.write(data);
    write((addr << 1) | WR, TXR); // present slave address, set write-bit
    write(0x90, CR);              // set command (start, write)
-
-   write(mem_addr, TXR); // present slave memory address
-   write(0x10, CR);  // set command (write)
-   write(data, TXR); // present the data
-   write(0x10, CR);  // set command (write)
-
-   write(0x40, CR); // Stop
-
+   write(mem_addr, TXR);         // present slave memory address
+   write(0x10, CR);              // set command (write)
+   write(data, TXR);             // present the data
+   write(0x10, CR);              // set command (write)
+   write(0x40, CR);              // Stop
 }
 
-  sc_uint<8> driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
-
+sc_uint<8> driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
    write((addr << 1) | RD, TXR); // present slave address, set read-bit
    write(0x90, CR);              // set command (start, write)
-   write(mem_addr, TXR);             // present slave memory address
+   write(mem_addr, TXR);         // present slave memory address
    write(0x10, CR);              // set command (write)
    write(0x20, CR);              // set command (read)
    read(RXR);                    // read the register
@@ -122,28 +115,24 @@ void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
    cout << "RECEIVED BYTE: " << received << endl;
    write(0x40, CR); // Stop
    return received;
-
 }
 
 void driver::core_enable(){
    write(0x0A, PRER_LO); // load prescaler lo-byte
    write(0x00, PRER_HI); // load prescaler hi-byte
-   write(0x80, CTR); // enable core
-
+   write(0x80, CTR);     // enable core
 }
 
-
 void monitor::mnt_out(sc_uint<8> received){
-  //while(true){
   wait(2);
   cout<<"@"<<sc_time_stamp()<<" entered scoreboard!" << endl;
   num_available= scb_int->fifo.num_available();
   if (num_available > 0 ){
   data_out_read = received;
   data_out_exp =  scb_int->fifo.read();;
-  cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
-  cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
-  //Checker
+  cout<<"@"<<sc_time_stamp()<<" Data expected: " << data_out_exp << endl;
+  cout<<"@"<<sc_time_stamp()<<" Data received: " << data_out_read << endl;
+  // Checker
   //if (data_out_exp != data_out_read)
   //  cout<<"@"<<sc_time_stamp()<<" ERROR: data read and expected mismatch!" << endl;
   //else
