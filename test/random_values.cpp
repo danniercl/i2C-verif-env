@@ -28,10 +28,9 @@ void suite_test::random_addr() {
    env->drv->read(SR);
 
    if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
-     cout << "ERROR: Slave addr is not present " << endl;
-     cout << "=======================================" << endl;
-     cout << " SIMULATION END" << endl;
-     cout << "=======================================" << endl;
+     cout << "================================" << endl;
+     cout << "ERROR: Slave addr is not present" << endl;
+     cout << "================================" << endl;
      return;
    }
 
@@ -159,8 +158,10 @@ void suite_test::random_all() {
    env->drv->read(SR);
 
    if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
-     cout << "ERROR: Slave addr is not present " << endl;
-     intf_int->done = 1;
+     cout << "================================" << endl;
+     cout << "ERROR: Slave addr is not present" << endl;
+     cout << "================================" << endl;
+     return;
    }
 
    env->drv->write_data(addr, mem_addr, data);
