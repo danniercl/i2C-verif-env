@@ -97,7 +97,7 @@ void driver::read(sc_uint<8> addr){
 
 
 void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
-
+   scb_int->fifo.write(data);
    write((addr << 1) | WR, TXR); // present slave address, set write-bit
    write(0x90, CR);              // set command (start, write)
 
@@ -110,7 +110,7 @@ void driver::write_data(sc_uint<8> addr, sc_uint<8> mem_addr, sc_uint<8> data){
 
 }
 
-void driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
+  sc_uint<8> driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
 
    write((addr << 1) | RD, TXR); // present slave address, set read-bit
    write(0x90, CR);              // set command (start, write)
@@ -118,8 +118,10 @@ void driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
    write(0x10, CR);              // set command (write)
    write(0x20, CR);              // set command (read)
    read(RXR);                    // read the register
-   cout << "RECEIVED BYTE: " << intf_int->wb_dat_o << endl;
+   sc_uint<8> received = intf_int->wb_dat_o;
+   cout << "RECEIVED BYTE: " << received << endl;
    write(0x40, CR); // Stop
+   return received;
 
 }
 
@@ -131,18 +133,21 @@ void driver::core_enable(){
 }
 
 
-void monitor::mnt_out(){
+void monitor::mnt_out(sc_uint<8> received){
   //while(true){
   wait(2);
-  data_out_exp =  intf_int->wb_dat_o;
-  //data_out_exp =  scb_int->fifo.read();;
-  data_out_read = intf_int->wb_dat_i;
-  // cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
-  // cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
+  cout<<"@"<<sc_time_stamp()<<" entered scoreboard!" << endl;
+  num_available= scb_int->fifo.num_available();
+  if (num_available > 0 ){
+  data_out_read = received;
+  data_out_exp =  scb_int->fifo.read();;
+  cout<<"@"<<sc_time_stamp()<<" data_out_exp:" << data_out_exp << endl;
+  cout<<"@"<<sc_time_stamp()<<" data_out_read:" << data_out_read << endl;
   //Checker
   //if (data_out_exp != data_out_read)
   //  cout<<"@"<<sc_time_stamp()<<" ERROR: data read and expected mismatch!" << endl;
   //else
   //  cout<<"@"<<sc_time_stamp()<<" SIRVE PAPIS; SIRVE!!!" << endl;
   //}
+}
 }
