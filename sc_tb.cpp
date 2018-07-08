@@ -81,6 +81,9 @@ void driver::core_enable(){
 }
 
 void monitor::mnt_out(){
+  const std::string red("\033[0;31m");
+  const std::string green("\033[1;32m");
+  const std::string reset("\033[0m");
   //while(true){
   wait(2);
   bool failed_test;
@@ -102,12 +105,12 @@ void monitor::mnt_out(){
   << " data_out_read: "<< data_out_read << endl;
   }
   if (failed_test) {
-  cout << "=======================================" << endl;
+  cout << red << "=======================================" << endl;
   cout << " TEST FAILED!" << endl;
-  cout << "=======================================" << endl;
+  cout << "=======================================" << reset << endl;
 } else {
-  cout << "=======================================" << endl;
+  cout << green << "=======================================" << endl;
   cout << " TEST PASSED!" << endl;
-  cout << "=======================================" << endl;
+  cout << "=======================================" << reset << endl;
   }
 }
