@@ -239,6 +239,7 @@ SC_MODULE (suite_test) {
   void random_mem_addr();
   void random_data();
   void random_all();
+  void reset_test();
   void test ();
 
   SC_HAS_PROCESS(suite_test);
