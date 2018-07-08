@@ -10,6 +10,9 @@
 
 // This test checks the DUT working with a Normal Speed:
 void suite_test::normal_speed() {
+  cout << "***************************************" << endl;
+  cout << " TEST: NORMAL SPEED" << endl;
+  cout << "***************************************" << endl;
   // Declate the clock counter
   int clock_counter = 0;
   int nominal_cycles = PROCESS_CYCLES * NORMAL_SCALE;
@@ -34,6 +37,8 @@ void suite_test::normal_speed() {
   // *********
   clock_counter = env->clock_counter;
   env->drv->write_data(addr, mem_addr, data);
+  /* Store value in expected fifo */
+  env->drv->scb_int->expected_fifo.nb_write(data);
   // Get the amount of cycles taken by the write
   clock_counter = env->clock_counter - clock_counter;
 
@@ -53,6 +58,8 @@ void suite_test::normal_speed() {
   // *******
   clock_counter = env->clock_counter;
   received = env->drv->read_data(addr, mem_addr);
+  /* Store received value in received fifo*/
+   env->drv->scb_int->received_fifo.nb_write(received);
   // Get the amount of cycles taken by the read
   clock_counter = env->clock_counter - clock_counter;
 
@@ -70,7 +77,7 @@ void suite_test::normal_speed() {
 
   // M O N I T O R
   // *************
-  env->mnt->mnt_out(received);
+  env->mnt->mnt_out();
   wait(10);
 
   // TODO: SCOREBOARD - CHECKER
@@ -78,6 +85,9 @@ void suite_test::normal_speed() {
 
 // This test checks the DUT working with a Fast Speed:
 void suite_test::fast_speed() {
+  cout << "***************************************" << endl;
+  cout << " TEST: FAST SPEED" << endl;
+  cout << "***************************************" << endl;
   // Declate the clock counter
   int clock_counter = 0;
   int nominal_cycles = PROCESS_CYCLES * FAST_SCALE;
@@ -101,6 +111,8 @@ void suite_test::fast_speed() {
   // W R I T E
   // *********
   clock_counter = env->clock_counter;
+  /* Store value in expected fifo */
+  env->drv->scb_int->expected_fifo.nb_write(data);
   env->drv->write_data(addr, mem_addr, data);
   // Get the amount of cycles taken by the write
   clock_counter = env->clock_counter - clock_counter;
@@ -121,6 +133,8 @@ void suite_test::fast_speed() {
   // *******
   clock_counter = env->clock_counter;
   received = env->drv->read_data(addr, mem_addr);
+  /* Store received value in received fifo*/
+  env->drv->scb_int->received_fifo.nb_write(received);
   // Get the amount of cycles taken by the read
   clock_counter = env->clock_counter - clock_counter;
 
@@ -138,7 +152,7 @@ void suite_test::fast_speed() {
 
   // M O N I T O R
   // *************
-  env->mnt->mnt_out(received);
+  env->mnt->mnt_out();
   wait(10);
 
   // TODO: SCOREBOARD - CHECKER

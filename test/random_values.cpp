@@ -2,6 +2,9 @@
 
 // This is a test using random address slave
 void suite_test::random_addr() {
+  cout << "***************************************" << endl;
+  cout << " TEST: RANDOM ADDRESS" << endl;
+  cout << "***************************************" << endl;
    env->drv->reset();
    // Generate address (ID) of the slave
    sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
@@ -33,20 +36,23 @@ void suite_test::random_addr() {
      cout << "================================" << endl;
      return;
    }
-
+   /* Store value in expected fifo */
+   env->drv->scb_int->expected_fifo.nb_write(data);
    env->drv->write_data(addr, mem_addr, data);
    wait(1000);
 
    // R E A D
    // *******
    received = env->drv->read_data(addr, mem_addr);
+   /* Store received value in received fifo*/
+   env->drv->scb_int->received_fifo.nb_write(received);
    wait(10);
 
-   env->mnt->mnt_out(received);
+   env->mnt->mnt_out();
    wait(10);
    // Request for simulation termination
    cout << "=======================================" << endl;
-   cout << " SIMULATION END" << endl;
+   cout << " SIMULATION ENDED" << endl;
    cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
@@ -55,6 +61,9 @@ void suite_test::random_addr() {
 
 // This is a test using random memory address for the RAM in the slave
 void suite_test::random_mem_addr() {
+  cout << "***************************************" << endl;
+  cout << " TEST: RANDOM MEMORY ADDRESS" << endl;
+  cout << "***************************************" << endl;
    sc_uint<8> addr = 0x2; // Slave address
    env->drv->reset();
    sc_uint<8> data = 250;
@@ -72,20 +81,23 @@ void suite_test::random_mem_addr() {
 
    // W R I T E
    // *********
-
+   /* Store value in expected fifo */
+   env->drv->scb_int->expected_fifo.nb_write(data);
    env->drv->write_data(addr, mem_addr, data);
    wait(1000);
 
    // R E A D
    // *******
    received = env->drv->read_data(addr, mem_addr);
+   /* Store received value in received fifo*/
+   env->drv->scb_int->received_fifo.nb_write(received);
    wait(10);
 
-   env->mnt->mnt_out(received);
+   env->mnt->mnt_out();
    wait(10);
    // Request for simulation termination
    cout << "=======================================" << endl;
-   cout << " SIMULATION END" << endl;
+   cout << " SIMULATION ENDED" << endl;
    cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
@@ -94,6 +106,9 @@ void suite_test::random_mem_addr() {
 
 // This is a test using random data to send
 void suite_test::random_data() {
+  cout << "***************************************" << endl;
+  cout << " TEST: RANDOM DATA" << endl;
+  cout << "***************************************" << endl;
    sc_uint<8> addr = 0x2; // Slave address
    env->drv->reset();
    sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen();
@@ -111,20 +126,23 @@ void suite_test::random_data() {
 
    // W R I T E
    // *********
-
+   /* Store value in expected fifo */
+   env->drv->scb_int->expected_fifo.nb_write(data);
    env->drv->write_data(addr, mem_addr, data);
    wait(1000);
 
    // R E A D
    // *******
    received = env->drv->read_data(addr, mem_addr);
+   /* Store received value in received fifo*/
+   env->drv->scb_int->received_fifo.nb_write(received);
    wait(10);
 
-   env->mnt->mnt_out(received);
+   env->mnt->mnt_out();
    wait(10);
    // Request for simulation termination
    cout << "=======================================" << endl;
-   cout << " SIMULATION END" << endl;
+   cout << " SIMULATION ENDED" << endl;
    cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
@@ -132,6 +150,9 @@ void suite_test::random_data() {
 
 // This is a test using random all the values
 void suite_test::random_all() {
+  cout << "***************************************" << endl;
+  cout << " TEST: RANDOM ALL" << endl;
+  cout << "***************************************" << endl;
    env->drv->reset();
    // Generate address (ID) of the slave
    sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
@@ -163,20 +184,23 @@ void suite_test::random_all() {
      cout << "================================" << endl;
      return;
    }
-
+   /* Store value in expected fifo */
+   env->drv->scb_int->expected_fifo.nb_write(data);
    env->drv->write_data(addr, mem_addr, data);
    wait(1000);
 
    // R E A D
    // *******
    received = env->drv->read_data(addr, mem_addr);
+   /* Store received value in received fifo*/
+   env->drv->scb_int->received_fifo.nb_write(received);
    wait(10);
 
-   env->mnt->mnt_out(received);
+   env->mnt->mnt_out();
    wait(10);
    // Request for simulation termination
    cout << "=======================================" << endl;
-   cout << " SIMULATION END" << endl;
+   cout << " SIMULATION ENDED" << endl;
    cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
