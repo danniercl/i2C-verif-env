@@ -3,9 +3,10 @@
 // This is a Basic Write/Read test
 void suite_test::basic_test() {
    // Generate address (ID) of the slave
-   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
+   sc_uint<8> addr = 0x2;
    env->drv->reset();
-   sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen(); // Generate random data to send
+   // Generate random data to send
+   sc_uint<8> data = 200;
    cout << "SENT BYTE: " << data << endl;
    sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;

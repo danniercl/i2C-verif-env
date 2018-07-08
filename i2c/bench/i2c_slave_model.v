@@ -87,7 +87,7 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	//
 	wire debug = 1'b1;
 
-	reg [7:0] mem [3:0]; // initiate memory
+	reg [7:0] mem [255:0]; // initiate memory
 	reg [7:0] mem_adr;   // memory address
 	reg [7:0] mem_do;    // memory data output
 
@@ -278,7 +278,7 @@ module i2c_slave_model (scl, sda_input, sda_output);
 
 	                        if(!rw)
 	                          begin
-	                              mem[ mem_adr[3:0] ] <= #1 sr; // store data in memory
+	                              mem[ mem_adr ] <= #1 sr; // store data in memory
 
 	                              if(debug)
 	                                #2 $display("DEBUG i2c_slave; data block write %x to address %x", sr, mem_adr);
