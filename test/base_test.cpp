@@ -7,7 +7,7 @@ void base_test::test() {
    env->drv->reset();
    sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen(); // Generate random data to send
    cout << "SENT BYTE: " << data << endl;
-
+   sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;
 
    // R E S E T
@@ -26,10 +26,10 @@ void base_test::test() {
 
    // R E A D
    // *******
-   env->drv->read_data(addr, mem_addr);
+   received = env->drv->read_data(addr, mem_addr);
    wait(10);
 
-   env->mnt->mnt_out();
+   env->mnt->mnt_out(received);
    wait(10);
    // Request for simulation termination
    cout << "=======================================" << endl;

@@ -131,7 +131,7 @@ SC_MODULE (driver) {
   void write(sc_uint<8>, sc_uint<8>);
   void read(sc_uint<8>);
   void write_data(sc_uint<8>, sc_uint<8>, sc_uint<8>);
-  void read_data(sc_uint<8>, sc_uint<8>);
+  sc_uint<8> read_data(sc_uint<8>, sc_uint<8>);
   void core_enable();
 
 };
@@ -153,11 +153,11 @@ SC_MODULE (monitor) {
     intf_int=intf_ext;
     //Scoreboard
    scb_int = scb_ext;
-    SC_THREAD(mnt_out);
-      sensitive << intf_int->wb_we_i.pos();
+    // SC_THREAD(mnt_out);
+    //   sensitive << intf_int->wb_we_i.pos();
   }
 
-  void mnt_out();
+  void mnt_out(sc_uint<8>);
 
 };
 
