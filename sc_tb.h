@@ -218,6 +218,7 @@ SC_MODULE (environment) {
   driver *drv;
   monitor *mnt;
   scoreboard *scb;
+  int clock_counter;
 
   SC_HAS_PROCESS(environment);
   environment(sc_module_name environment, interface *intf_ext) {
@@ -227,6 +228,8 @@ SC_MODULE (environment) {
     drv = new driver("drv",scb,intf_ext);
     //Monitor
     mnt = new monitor("mnt",scb,intf_ext);
+    //Clock Counter
+    clock_counter = 0;
   }
 };
 
@@ -234,20 +237,38 @@ SC_MODULE (suite_test) {
   interface *intf_int;
   environment *env;
 
+  // B A S I C  T E S T
+  // ------------------
   void basic_test();
+
+  // C O R N E R  C A S E S
+  // ----------------------
+  void reset_test();
+
+  // F R E Q U E N C Y
+  // -----------------
+  void normal_speed ();
+  void fast_speed ();
+
+  // R A N D O M  V A L U E S
+  // ------------------------
   void random_addr();
   void random_mem_addr();
   void random_data();
   void random_all();
-  void reset_test();
+
+  // SUITE INIT
+  // **********
   void test ();
+  void clock_counter ();
 
   SC_HAS_PROCESS(suite_test);
   suite_test(sc_module_name suite_test, interface *intf_ext) {
     intf_int = intf_ext;
     //environment
     env = new environment("env",intf_ext);
-    SC_CTHREAD(test,intf_ext->wb_clk_i.pos());
+    SC_CTHREAD(clock_counter, intf_ext->wb_clk_i.pos());
+    SC_CTHREAD(test, intf_ext->wb_clk_i.pos());
   }
 };
 
