@@ -7,6 +7,7 @@ void suite_test::test() {
   //suite_test::random_addr();
   //suite_test::random_mem_addr();
   //suite_test::random_data();
-  suite_test::random_all();
+  //suite_test::random_all();
+  suite_test::reset_test();
   intf_int->done = 1;
 }
