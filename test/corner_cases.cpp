@@ -25,7 +25,7 @@ void suite_test::reset_test() {
    cout<<"@"<<sc_time_stamp()<<" Starting Reset " << endl;
    intf_int->wb_rst_i = true;
 
-   cout<<"@"<<sc_time_stamp()<<" Trying a start condition" << endl;
+   cout<<"@"<<sc_time_stamp()<<" Trying a stop condition" << endl;
    env->drv->write(0x40, CR);
 
    wait(4);
