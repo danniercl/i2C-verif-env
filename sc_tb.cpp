@@ -83,8 +83,9 @@ void monitor::mnt_out(){
   bool failed_test;
   // num_free = scb_int->expected_fifo.num_free();
   //  cout << "fifo size: " << num_free << endl;
-  cout<<"@"<<sc_time_stamp()<<" entered scoreboard!" << endl;
+  cout<<"@"<<sc_time_stamp()<<" SCOREBOARD INFORMATION : " << endl;
   num_available= scb_int->expected_fifo.num_available();
+  if (num_available == 0) failed_test = true;
   for (sc_uint<8> j = 0; j < num_available ; j ++){
   data_out_read = scb_int->received_fifo.read();;
   data_out_exp  =  scb_int->expected_fifo.read();

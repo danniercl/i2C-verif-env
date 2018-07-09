@@ -34,8 +34,9 @@ void suite_test::two_slave() {
 
   if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
     cout << "========================================" << endl;
-    cout << "ERROR CATCHED: Slave addr is not present" << endl;
+    cout << "ERROR CATCHED: Slave addr " << addr << " is not present" << endl;
     cout << "========================================" << endl;
+    env->mnt->mnt_out();
     return;
   }
   /* Store value in expected fifo */
@@ -81,8 +82,9 @@ void suite_test::two_slave() {
 
  if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
    cout << "========================================" << endl;
-   cout << "ERROR CATCHED: Slave addr is not present" << endl;
+   cout << "ERROR CATCHED: Slave addr " << addr << " is not present" << endl;
    cout << "========================================" << endl;
+   env->mnt->mnt_out();
    return;
  }
  /* Store value in expected fifo */
