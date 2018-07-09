@@ -21,9 +21,17 @@ void suite_test::reset_test() {
    env->drv->scb_int->expected_fifo.nb_write(data);
    env->drv->write_data(addr, mem_addr, data);
    wait(4);
+
+   cout<<"@"<<sc_time_stamp()<<" Starting Reset " << endl;
    intf_int->wb_rst_i = true;
+
+   cout<<"@"<<sc_time_stamp()<<" Trying a start condition" << endl;
+   env->drv->write(0x40, CR);
+
    wait(4);
    intf_int->wb_rst_i = false;
+   cout<<"@"<<sc_time_stamp()<<" Finished Reset " << endl;
+
    env->drv->core_enable();
    wait(4);
   received = env->drv->read_data(addr, mem_addr);
