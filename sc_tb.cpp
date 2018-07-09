@@ -4,7 +4,7 @@ void driver::reset(){
   stim_gen_inst->init_seed_gen();
   intf_int->wb_rst_i = false;
   intf_int->arst_i = true;
-  cout<<"@"<<sc_time_stamp()<<" Started Reset " << endl;
+  cout<<"@"<<sc_time_stamp()<<" Starting Reset " << endl;
   wait(4);
   intf_int->arst_i = false;
   wait(4);
@@ -13,8 +13,6 @@ void driver::reset(){
 }
 
 void driver::write(sc_uint<8> data, sc_uint<8> addr){
-  wait(2);
-  cout << "WRITE: data: " << data << " addr: " << addr << endl;
   wait(2);
   intf_int->wb_adr_i = addr;
   intf_int->wb_dat_i = data;
@@ -27,10 +25,8 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
   wait(2);
   intf_int->wb_cyc_i= false;
   intf_int->wb_stb_i= false;
-  intf_int->wb_adr_i  = addr;
 
 	intf_int->wb_we_i  = false;
-  cout<<"@"<<sc_time_stamp()<<" Writing " << endl;
 
   sc_uint<8> need_wait_ack = data & ((1 << CR_WR) |
                                      (1 << CR_RD) |
@@ -45,7 +41,6 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
 }
 
 void driver::read(sc_uint<8> addr){
-  cout<<"@"<<sc_time_stamp()<<" Reading " << endl;
   intf_int->wb_adr_i = addr;
   wait(4);
 }
@@ -69,7 +64,6 @@ sc_uint<8> driver::read_data(sc_uint<8> addr, sc_uint<8> mem_addr){
    write(0x20, CR);              // set command (read)
    read(RXR);                    // read the register
    sc_uint<8> received = intf_int->wb_dat_o;
-   cout << "RECEIVED BYTE: " << received << endl;
    write(0x40, CR); // Stop
    return received;
 }
@@ -81,9 +75,9 @@ void driver::core_enable(){
 }
 
 void monitor::mnt_out(){
-  const std::string red("\033[0;31m");
-  const std::string green("\033[1;32m");
-  const std::string reset("\033[0m");
+  string red("\033[0;31m");
+  string green("\033[1;32m");
+  string reset("\033[0m");
   //while(true){
   wait(2);
   bool failed_test;
@@ -105,12 +99,12 @@ void monitor::mnt_out(){
   << " data_out_read: "<< data_out_read << endl;
   }
   if (failed_test) {
-  cout << red << "=======================================" << endl;
-  cout << " TEST FAILED!" << endl;
-  cout << "=======================================" << reset << endl;
+  cout << red << "=============" << endl;
+  cout <<        " TEST FAILED!" << endl;
+  cout        << "=============" << reset << endl;
 } else {
-  cout << green << "=======================================" << endl;
-  cout << " TEST PASSED!" << endl;
-  cout << "=======================================" << reset << endl;
+  cout << green << "=============" << endl;
+  cout          << " TEST PASSED!" << endl;
+  cout          << "=============" << reset << endl;
   }
 }

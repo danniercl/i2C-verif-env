@@ -85,7 +85,7 @@ module i2c_slave_model (scl, sda_input, sda_output);
 	//
 	// Variable declaration
 	//
-	wire debug = 1'b1;
+	wire debug = 1'b0;
 
 	reg [7:0] mem [255:0]; // initiate memory
 	reg [7:0] mem_adr;   // memory address
