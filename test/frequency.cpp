@@ -10,9 +10,9 @@
 
 // This test checks the DUT working with a Normal Speed:
 void suite_test::normal_speed() {
-  cout << "***************************************" << endl;
+  cout << "*******************" << endl;
   cout << " TEST: NORMAL SPEED" << endl;
-  cout << "***************************************" << endl;
+  cout << "*******************" << endl;
   // Declate the clock counter
   int clock_counter = 0;
   int nominal_cycles = PROCESS_CYCLES * NORMAL_SCALE;
@@ -85,9 +85,9 @@ void suite_test::normal_speed() {
 
 // This test checks the DUT working with a Fast Speed:
 void suite_test::fast_speed() {
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
   cout << " TEST: FAST SPEED" << endl;
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
   // Declate the clock counter
   int clock_counter = 0;
   int nominal_cycles = PROCESS_CYCLES * FAST_SCALE;

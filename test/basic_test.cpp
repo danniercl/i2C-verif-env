@@ -2,15 +2,14 @@
 
 // This is a Basic Write/Read test
 void suite_test::basic_test() {
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
   cout << " TEST: BASIC TEST" << endl;
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
    // Generate address (ID) of the slave
    sc_uint<8> addr = 0x2;
    env->drv->reset();
    // Generate random data to send
    sc_uint<8> data = 200;
-   cout << "SENT BYTE: " << data << endl;
    sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;
 
@@ -37,11 +36,6 @@ void suite_test::basic_test() {
    wait(10);
 
    env->mnt->mnt_out();
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }

@@ -2,14 +2,13 @@
 
 // This is a test using random address slave
 void suite_test::random_addr() {
-  cout << "***************************************" << endl;
+  cout << "*********************" << endl;
   cout << " TEST: RANDOM ADDRESS" << endl;
-  cout << "***************************************" << endl;
+  cout << "*********************" << endl;
    env->drv->reset();
    // Generate address (ID) of the slave
    sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
    sc_uint<8> data = 250;
-   cout << "SENT BYTE: " << data << endl;
    sc_uint<8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;
    sc_uint<8> ack_mask = 1 << SR_RXACK;
@@ -31,9 +30,9 @@ void suite_test::random_addr() {
    env->drv->read(SR);
 
    if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
-     cout << "================================" << endl;
-     cout << "ERROR: Slave addr is not present" << endl;
-     cout << "================================" << endl;
+     cout << "========================================" << endl;
+     cout << "ERROR CATCHED: Slave addr is not present" << endl;
+     cout << "========================================" << endl;
      return;
    }
    /* Store value in expected fifo */
@@ -49,11 +48,6 @@ void suite_test::random_addr() {
    wait(10);
 
    env->mnt->mnt_out();
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }
@@ -61,13 +55,12 @@ void suite_test::random_addr() {
 
 // This is a test using random memory address for the RAM in the slave
 void suite_test::random_mem_addr() {
-  cout << "***************************************" << endl;
+  cout << "****************************" << endl;
   cout << " TEST: RANDOM MEMORY ADDRESS" << endl;
-  cout << "***************************************" << endl;
+  cout << "****************************" << endl;
    sc_uint<8> addr = 0x2; // Slave address
    env->drv->reset();
    sc_uint<8> data = 250;
-   cout << "SENT BYTE: " << data << endl;
    sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr =  env->drv->stim_gen_inst->mem_addr_rnd_gen();
 
@@ -94,11 +87,6 @@ void suite_test::random_mem_addr() {
    wait(10);
 
    env->mnt->mnt_out();
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }
@@ -106,13 +94,12 @@ void suite_test::random_mem_addr() {
 
 // This is a test using random data to send
 void suite_test::random_data() {
-  cout << "***************************************" << endl;
+  cout << "******************" << endl;
   cout << " TEST: RANDOM DATA" << endl;
-  cout << "***************************************" << endl;
+  cout << "******************" << endl;
    sc_uint<8> addr = 0x2; // Slave address
    env->drv->reset();
    sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen();
-   cout << "SENT BYTE: " << data << endl;
    sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;
 
@@ -139,25 +126,19 @@ void suite_test::random_data() {
    wait(10);
 
    env->mnt->mnt_out();
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }
 
 // This is a test using random all the values
 void suite_test::random_all() {
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
   cout << " TEST: RANDOM ALL" << endl;
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
    env->drv->reset();
    // Generate address (ID) of the slave
    sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
    sc_uint<8> data = env->drv->stim_gen_inst->data_rnd_gen();
-   cout << "SENT BYTE: " << data << endl;
    sc_uint<8> received = 0x00;
    sc_uint<8> mem_addr = env->drv->stim_gen_inst->mem_addr_rnd_gen();
    sc_uint<8> ack_mask = 1 << SR_RXACK;
@@ -179,9 +160,9 @@ void suite_test::random_all() {
    env->drv->read(SR);
 
    if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
-     cout << "================================" << endl;
-     cout << "ERROR: Slave addr is not present" << endl;
-     cout << "================================" << endl;
+     cout << "========================================" << endl;
+     cout << "ERROR CATCHED: Slave addr is not present" << endl;
+     cout << "========================================" << endl;
      return;
    }
    /* Store value in expected fifo */
@@ -197,11 +178,6 @@ void suite_test::random_all() {
    wait(10);
 
    env->mnt->mnt_out();
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }

@@ -2,13 +2,12 @@
 
 //-----------------------------
 void suite_test::reset_test() {
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
   cout << " TEST: RESET TEST" << endl;
-  cout << "***************************************" << endl;
+  cout << "*****************" << endl;
    sc_uint<8> addr = 0x2; // Slave address
    env->drv->reset();
    sc_uint<8> data = 200;
-   cout << "SENT BYTE: " << data << endl;
    sc_uint <8> received = 0x00;
    sc_uint<8> mem_addr = 0x01;
 
@@ -31,11 +30,6 @@ void suite_test::reset_test() {
   /* Store received value in received fifo*/
   env->drv->scb_int->received_fifo.nb_write(received);
 
-   wait(10);
-   // Request for simulation termination
-   cout << "=======================================" << endl;
-   cout << " SIMULATION ENDED" << endl;
-   cout << "=======================================" << endl;
    wait(1000);
   // Just wait for few cycles
 }
