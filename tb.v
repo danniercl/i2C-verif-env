@@ -81,6 +81,7 @@ module tb();
   // **************************************************************************
 
   // Create I2C BUS Lines
+  pullup p(sda_pad_i);
 
   i2c_slave_model #(ADDR_SLAVE) i2c_slave (
     .sda_output(sda_pad_i),
