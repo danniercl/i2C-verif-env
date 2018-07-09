@@ -17,6 +17,10 @@ void suite_test::test() {
   suite_test::normal_speed();
   suite_test::fast_speed();
 
+  // M U L T I S L A V E
+  // -------------------
+  suite_test::two_slave();
+
   // R A N D O M  V A L U E S
   // ------------------------
  suite_test::random_addr();
