@@ -28,6 +28,8 @@ void suite_test::test() {
  suite_test::random_data();
  suite_test::random_all();
 
+ suite_test::burst();
+
   intf_int->done = 1;
 }
 
