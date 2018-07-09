@@ -29,6 +29,8 @@ void suite_test::reset_test() {
   received = env->drv->read_data(addr, mem_addr);
   /* Store received value in received fifo*/
   env->drv->scb_int->received_fifo.nb_write(received);
+  wait(4);
+  env->mnt->mnt_out();
 
    wait(1000);
   // Just wait for few cycles

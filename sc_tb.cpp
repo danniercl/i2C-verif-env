@@ -81,7 +81,7 @@ void monitor::mnt_out(){
   string reset("\033[0m");
   //while(true){
   wait(2);
-  bool failed_test;
+  bool failed_test = false;
   // num_free = scb_int->expected_fifo.num_free();
   //  cout << "fifo size: " << num_free << endl;
   cout<<"@"<<sc_time_stamp()<<" SCOREBOARD INFORMATION : " << endl;

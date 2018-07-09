@@ -193,7 +193,7 @@ void suite_test::burst() {
   cout << "*****************" << endl;
    env->drv->reset();
    // Generate address (ID) of the slave
-   sc_uint<8> addr = env->drv->stim_gen_inst->addr_rnd_gen(); // Slave address
+   sc_uint<8> addr = 0x2; // Slave address
    sc_uint<8> data = 0x00;
    sc_uint<8> received = 0x00;
    sc_uint<8> mem_addr = 0x00;
@@ -215,12 +215,6 @@ void suite_test::burst() {
    wait(4);
    env->drv->read(SR);
 
-   if((addr != 2) && ((sc_uint<8>) intf_int->wb_dat_o & ack_mask)){
-     cout << "========================================" << endl;
-     cout << "ERROR CATCHED: Slave addr is not present" << endl;
-     cout << "========================================" << endl;
-     return;
-   }
    for (size_t i = 0; i < 16; i++) {
      /* Store value in expected fifo */
      data = env->drv->stim_gen_inst->data_rnd_gen();
