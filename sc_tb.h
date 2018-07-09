@@ -154,8 +154,9 @@ SC_MODULE(stim_gen) {
   stim_gen(sc_module_name stim_gen) {
   }
 
-  void init_seed_gen(){
-    scv_random::set_global_seed(scv_random::pick_random_seed()); //FIXME: needs to come from test seed
+  void init_seed_gen(unsigned long semilla){
+    scv_random::set_global_seed(semilla); //FIXME: needs to come from test seed;
+    cout << "TEST_SEED: " << semilla << endl;
   }
   sc_uint<8 > data_rnd_gen(){
     data_rnd_constraint data_rnd ("data_rnd_constraint");
@@ -263,6 +264,7 @@ SC_MODULE (suite_test) {
   void random_mem_addr();
   void random_data();
   void random_all();
+  void burst();
 
   // SUITE INIT
   // **********

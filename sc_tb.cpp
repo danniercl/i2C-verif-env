@@ -1,7 +1,8 @@
 #include "sc_tb.h"
 
 void driver::reset(){
-  stim_gen_inst->init_seed_gen();
+  sc_uint<32> semilla = scv_random::pick_random_seed();
+  stim_gen_inst->init_seed_gen(semilla);
   intf_int->wb_rst_i = false;
   intf_int->arst_i = true;
   cout<<"@"<<sc_time_stamp()<<" Starting Reset " << endl;
@@ -80,7 +81,7 @@ void monitor::mnt_out(){
   string reset("\033[0m");
   //while(true){
   wait(2);
-  bool failed_test;
+  bool failed_test = false;
   // num_free = scb_int->expected_fifo.num_free();
   //  cout << "fifo size: " << num_free << endl;
   cout<<"@"<<sc_time_stamp()<<" SCOREBOARD INFORMATION : " << endl;
@@ -91,12 +92,12 @@ void monitor::mnt_out(){
   data_out_exp  =  scb_int->expected_fifo.read();
   //Checker
   if (data_out_exp != data_out_read){
-   cout<<"@"<<sc_time_stamp() <<" ERROR:  read data and expected data mismatch!" << "at iteration # "
+   cout<<"ERROR:  read data and expected data mismatch!" << "at iteration # "
    << j+1 << endl;
    failed_test = true;
  }
   else
-  cout<<"@" <<sc_time_stamp() <<  " Iteration # "<< j+1 <<" data_out_exp: " << data_out_exp
+  cout<<"Iteration # "<< j+1 <<" data_out_exp: " << data_out_exp
   << " data_out_read: "<< data_out_read << endl;
   }
   if (failed_test) {
