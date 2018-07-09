@@ -43,7 +43,8 @@ module tb();
 
   // Slave Address
   // *************
-  parameter ADDR_SLAVE = 7'h2;
+  parameter ADDR_SLAVE_1 = 7'h2;
+  parameter ADDR_SLAVE_2 = 7'h4;
 
   // Clock Generator
   // ***************
@@ -81,9 +82,15 @@ module tb();
   // **************************************************************************
 
   // Create I2C BUS Lines
-  pullup p(sda_pad_i);
+  pullup pull(sda_pad_i);
 
-  i2c_slave_model #(ADDR_SLAVE) i2c_slave (
+  i2c_slave_model #(ADDR_SLAVE_1) first_i2c_slave (
+    .sda_output(sda_pad_i),
+    .sda_input(sda_pad_o),
+    .scl(scl_pad_o)
+  );
+
+  i2c_slave_model #(ADDR_SLAVE_2) second_i2c_slave (
     .sda_output(sda_pad_i),
     .sda_input(sda_pad_o),
     .scl(scl_pad_o)

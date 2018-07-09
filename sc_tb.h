@@ -253,6 +253,10 @@ SC_MODULE (suite_test) {
   void normal_speed ();
   void fast_speed ();
 
+  // M U L T I S L A V E
+  // -------------------
+  void two_slave ();
+
   // R A N D O M  V A L U E S
   // ------------------------
   void random_addr();
