@@ -33,7 +33,7 @@ void suite_test::random_addr() {
      cout << "=====================================================" << endl;
      cout << "ERROR CATCHED: Slave addr " << addr << " is not present" << endl;
      cout << "=====================================================" << endl;
-      env->mnt->mnt_out();
+     env->mnt->mnt_out();
      return;
    }
    /* Store value in expected fifo */
