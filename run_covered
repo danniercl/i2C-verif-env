@@ -1,0 +1,2 @@
+covered score -t tb -v i2c/rtl/i2c_master_defines.v -v i2c/rtl/i2c_master_bit_ctrl.v -v i2c/rtl/i2c_master_byte_ctrl.v -v i2c/bench/i2c_slave_model.v -v i2c/rtl/i2c_master_top.v -v tb.v -vcd i2c.vcd -e i2c_slave_model -o report.cdd
+covered report report.cdd
