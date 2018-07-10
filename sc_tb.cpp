@@ -14,6 +14,7 @@ void driver::reset(){
 }
 
 void driver::write(sc_uint<8> data, sc_uint<8> addr){
+  int timeOut = 0;
   wait(2);
   intf_int->wb_adr_i = addr;
   intf_int->wb_dat_i = data;
@@ -36,7 +37,14 @@ void driver::write(sc_uint<8> data, sc_uint<8> addr){
 
   if (CR == addr && need_wait_ack) {
     while(false == intf_int->wb_ack_o){
-      wait(1);
+      if (timeOut < 100000){
+        timeOut = timeOut + 1;
+        wait(1);
+      }
+      else{
+        cout<<"@"<<sc_time_stamp() <<" Write timeOut!" << endl;
+        break;
+      }
     }
   }
 }
